@@ -80,13 +80,19 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-xs font-medium mb-1">Waktu (WIB)</label>
-                                <input type="time" id="j-waktu" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none">
+                                <label class="block text-xs font-medium mb-1">Tanggal</label>
+                                <input type="date" id="j-tanggal" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none">
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium mb-1">Tanggal</label>
-                            <input type="date" id="j-tanggal" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium mb-1">Jam Mulai</label>
+                                <input type="time" id="j-waktu" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium mb-1">Jam Selesai</label>
+                                <input type="time" id="j-waktu-selesai" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none">
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-medium mb-1">Link Pamflet (Opsional)</label>
@@ -360,6 +366,7 @@
             const type = document.getElementById('j-tipe').value;
             const date = document.getElementById('j-tanggal').value;
             const time = document.getElementById('j-waktu').value;
+            const timeEnd = document.getElementById('j-waktu-selesai').value;
             const link = document.getElementById('j-link').value;
             const pamflet = document.getElementById('j-pamflet').value;
 
@@ -367,11 +374,12 @@
 
             try {
                 const id = Date.now().toString();
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'schedules', id), { title, type, date, time, link, pamflet });
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'schedules', id), { title, type, date, time, timeEnd, link, pamflet });
                 
                 document.getElementById('j-judul').value = '';
                 document.getElementById('j-tanggal').value = '';
                 document.getElementById('j-waktu').value = '';
+                document.getElementById('j-waktu-selesai').value = '';
                 document.getElementById('j-link').value = '';
                 document.getElementById('j-pamflet').value = '';
                 window.showToast("Jadwal ditambahkan");
@@ -402,11 +410,11 @@
                 <div class="bg-white rounded-xl overflow-hidden shadow-sm border">
                     <iframe class="w-full aspect-video" src="${v.url}" frameborder="0" allowfullscreen></iframe>
                     <div class="p-3 flex justify-between items-start gap-2">
-                        <h4 class="font-bold text-sm text-slate-800 line-clamp-2">${v.title}</h4>
-                        <button onclick="deleteVideo('${v.id}')" class="text-red-400 hover:text-red-600 bg-red-50 p-2 rounded-lg transition shrink-0">
-                            <i class="fas fa-trash text-sm"></i>
-                        </button>
-                    </div>
+                    <span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-2 inline-block ${j.type === 'Kajian' ? 'bg-primary' : 'bg-emerald-500'}">${j.type}</span>
+                    <h4 class="font-bold text-base mb-1 pr-8 text-slate-800 leading-tight">${j.title}</h4>
+                    <p class="text-xs text-slate-500"><i class="far fa-calendar-alt w-4"></i> ${j.date}</p>
+                    <p class="text-xs text-slate-500"><i class="far fa-clock w-4"></i> ${j.time} ${j.timeEnd ? '- ' + j.timeEnd : ''} WIB</p>
+                    <a href="${j.link}" target="_blank" class="text-xs text-primary font-medium mt-2 block truncate"><i class="fas fa-link w-4"></i> ${j.link}</a>
                 </div>
             `).join('');
         }
