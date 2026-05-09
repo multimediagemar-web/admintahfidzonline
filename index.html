@@ -156,7 +156,7 @@
                             <input type="url" id="v-thumbnail" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="https://...">
                         </div>
                     </div>
-                    <button onclick="addVideo()" class="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-lg transition text-sm">
+                    <button id="btn-submit-video" onclick="addVideo()" class="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-lg transition text-sm">
                         Tambah Video
                     </button>
                 </div>
@@ -433,9 +433,14 @@
             }
             container.innerHTML = state.videos.map(v => `
                 <div class="bg-white rounded-xl overflow-hidden shadow-sm border relative flex flex-col">
-                    <button onclick="deleteVideo('${v.id}')" class="absolute top-2 right-2 bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition z-10 shadow-sm">
-                        <i class="fas fa-trash text-sm"></i>
-                    </button>
+                    <div class="absolute top-2 right-2 flex gap-1 z-10">
+                        <button onclick="editVideo('${v.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm">
+                            <i class="fas fa-edit text-sm"></i>
+                        </button>
+                        <button onclick="deleteVideo('${v.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm">
+                            <i class="fas fa-trash text-sm"></i>
+                        </button>
+                    </div>
                     <div class="h-32 w-full bg-slate-200 relative">
                         <img src="${v.thumbnail || 'https://images.unsplash.com/photo-1609599006353-e629aaab31f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" class="w-full h-full object-cover">
                         <div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded">
@@ -452,6 +457,30 @@
             `).join('');
         }
 
+        let editVideoId = null;
+
+        window.editVideo = function(id) {
+            const video = state.videos.find(v => v.id === id);
+            if (!video) return;
+
+            document.getElementById('v-judul').value = video.title || '';
+            document.getElementById('v-kategori').value = video.kategori || 'Tahfidz';
+            document.getElementById('v-tanggal').value = video.tanggal || '';
+            document.getElementById('v-durasi').value = video.durasi || '';
+            document.getElementById('v-url').value = video.url || '';
+            document.getElementById('v-thumbnail').value = video.thumbnail || '';
+
+            editVideoId = id;
+            const btn = document.getElementById('btn-submit-video');
+            btn.innerText = "Simpan Perubahan";
+            btn.classList.replace('bg-slate-900', 'bg-blue-600');
+            btn.classList.replace('hover:bg-slate-800', 'hover:bg-blue-700');
+            
+            // Scroll ke atas agar form terlihat di layar HP
+            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
         window.addVideo = async function() {
             if (!currentUser) return;
             const title = document.getElementById('v-judul').value;
@@ -464,17 +493,32 @@
             if(!title || !url || !tanggal) return window.showToast("Harap isi judul, tanggal, dan URL video!", "error");
 
             try {
-                const id = Date.now().toString();
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'videos', id), { title, kategori, tanggal, durasi, url, thumbnail });
+                const videoData = { title, kategori, tanggal, durasi, url, thumbnail };
+
+                if (editVideoId) {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'videos', editVideoId), videoData, { merge: true });
+                    window.showToast("Video berhasil diupdate");
+                } else {
+                    const id = Date.now().toString();
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'videos', id), videoData);
+                    window.showToast("Video ditambahkan");
+                }
                 
                 // Clear form
                 document.getElementById('v-judul').value = '';
+                document.getElementById('v-kategori').value = 'Tahfidz';
                 document.getElementById('v-tanggal').value = '';
                 document.getElementById('v-durasi').value = '';
                 document.getElementById('v-url').value = '';
                 document.getElementById('v-thumbnail').value = '';
+
+                // Reset state edit
+                editVideoId = null;
+                const btn = document.getElementById('btn-submit-video');
+                btn.innerText = "Tambah Video";
+                btn.classList.replace('bg-blue-600', 'bg-slate-900');
+                btn.classList.replace('hover:bg-blue-700', 'hover:bg-slate-800');
                 
-                window.showToast("Video ditambahkan");
             } catch (e) {
                 window.showToast("Gagal menyimpan video", "error");
             }
