@@ -120,15 +120,40 @@
                 
                 <!-- Form Tambah Video -->
                 <div class="bg-white p-5 rounded-xl shadow-sm border mb-6">
-                    <h3 class="font-bold mb-3 text-sm text-slate-600"><i class="fas fa-plus-circle text-primary mr-1"></i> Tambah Video YouTube</h3>
+                    <h3 class="font-bold mb-3 text-sm text-slate-600"><i class="fas fa-plus-circle text-primary mr-1"></i> Tambah Video</h3>
                     <div class="space-y-3">
                         <div>
                             <label class="block text-xs font-medium mb-1">Judul Video</label>
-                            <input type="text" id="v-judul" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="Cth: Kajian Tematik">
+                            <input type="text" id="v-judul" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="Cth: Panduan Tahsin Al-Fatihah">
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium mb-1">Kategori</label>
+                                <select id="v-kategori" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none">
+                                    <option value="Tahfidz">Tahfidz</option>
+                                    <option value="Tahsin">Tahsin</option>
+                                    <option value="Kajian">Kajian</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium mb-1">Tanggal Rilis</label>
+                                <input type="date" id="v-tanggal" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-medium mb-1">Durasi (Cth: 12:30)</label>
+                                <input type="text" id="v-durasi" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="12:30">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium mb-1">Link Video (YT/Drive)</label>
+                                <input type="url" id="v-url" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="https://...">
+                            </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-medium mb-1">URL Embed YouTube</label>
-                            <input type="url" id="v-url" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="https://www.youtube.com/embed/xyz">
+                            <label class="block text-xs font-medium mb-1">Link Thumbnail (Gambar)</label>
+                            <input type="url" id="v-thumbnail" class="w-full border px-3 py-2 rounded-lg text-sm focus:ring-2 focus:ring-primary outline-none" placeholder="https://...">
                         </div>
                     </div>
                     <button onclick="addVideo()" class="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-lg transition text-sm">
@@ -407,14 +432,22 @@
                 return;
             }
             container.innerHTML = state.videos.map(v => `
-                <div class="bg-white rounded-xl overflow-hidden shadow-sm border">
-                    <iframe class="w-full aspect-video" src="${v.url}" frameborder="0" allowfullscreen></iframe>
-                    <div class="p-3 flex justify-between items-start gap-2">
-                    <span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-2 inline-block ${j.type === 'Kajian' ? 'bg-primary' : 'bg-emerald-500'}">${j.type}</span>
-                    <h4 class="font-bold text-base mb-1 pr-8 text-slate-800 leading-tight">${j.title}</h4>
-                    <p class="text-xs text-slate-500"><i class="far fa-calendar-alt w-4"></i> ${j.date}</p>
-                    <p class="text-xs text-slate-500"><i class="far fa-clock w-4"></i> ${j.time} ${j.timeEnd ? '- ' + j.timeEnd : ''} WIB</p>
-                    <a href="${j.link}" target="_blank" class="text-xs text-primary font-medium mt-2 block truncate"><i class="fas fa-link w-4"></i> ${j.link}</a>
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm border relative flex flex-col">
+                    <button onclick="deleteVideo('${v.id}')" class="absolute top-2 right-2 bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition z-10 shadow-sm">
+                        <i class="fas fa-trash text-sm"></i>
+                    </button>
+                    <div class="h-32 w-full bg-slate-200 relative">
+                        <img src="${v.thumbnail || 'https://images.unsplash.com/photo-1609599006353-e629aaab31f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" class="w-full h-full object-cover">
+                        <div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded">
+                            ${v.durasi || '00:00'}
+                        </div>
+                    </div>
+                    <div class="p-3">
+                        <span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-1 inline-block ${v.kategori === 'Tahfidz' ? 'bg-emerald-500' : v.kategori === 'Tahsin' ? 'bg-blue-500' : 'bg-slate-800'}">${v.kategori || 'Kajian'}</span>
+                        <h4 class="font-bold text-sm text-slate-800 leading-snug line-clamp-2">${v.title}</h4>
+                        <p class="text-[10px] text-slate-500 mt-1"><i class="far fa-calendar-alt"></i> ${v.tanggal || '-'}</p>
+                        <a href="${v.url}" target="_blank" class="text-[10px] text-primary font-medium mt-2 block truncate"><i class="fas fa-link"></i> ${v.url}</a>
+                    </div>
                 </div>
             `).join('');
         }
@@ -422,16 +455,25 @@
         window.addVideo = async function() {
             if (!currentUser) return;
             const title = document.getElementById('v-judul').value;
+            const kategori = document.getElementById('v-kategori').value;
+            const tanggal = document.getElementById('v-tanggal').value;
+            const durasi = document.getElementById('v-durasi').value;
             const url = document.getElementById('v-url').value;
+            const thumbnail = document.getElementById('v-thumbnail').value;
 
-            if(!title || !url) return window.showToast("Harap isi judul dan URL!", "error");
-            if(!url.includes('embed')) return window.showToast("Gunakan URL YouTube format embed!", "error");
+            if(!title || !url || !tanggal) return window.showToast("Harap isi judul, tanggal, dan URL video!", "error");
 
             try {
                 const id = Date.now().toString();
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'videos', id), { title, url });
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'videos', id), { title, kategori, tanggal, durasi, url, thumbnail });
+                
+                // Clear form
                 document.getElementById('v-judul').value = '';
+                document.getElementById('v-tanggal').value = '';
+                document.getElementById('v-durasi').value = '';
                 document.getElementById('v-url').value = '';
+                document.getElementById('v-thumbnail').value = '';
+                
                 window.showToast("Video ditambahkan");
             } catch (e) {
                 window.showToast("Gagal menyimpan video", "error");
