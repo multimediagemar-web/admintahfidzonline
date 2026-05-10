@@ -756,11 +756,12 @@
             
             if(titleEl) titleEl.innerText = title || "Kajian"; 
             let embedUrl = url; 
-            const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/; 
-            const ytMatch = url.match(ytRegExp);
             
-            if (ytMatch && ytMatch[2].length === 11) {
-                embedUrl = `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1&rel=0`; 
+            // Rumus baru yang lebih pintar untuk mendeteksi berbagai jenis URL YouTube termasuk Shorts
+            const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
+            
+            if (ytMatch && ytMatch[1]) {
+                embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`; 
             } else if (url.includes('drive.google.com')) {
                 embedUrl = url.replace(/\/view.*$/, '/preview');
             }
@@ -776,15 +777,32 @@
             if(modal && panel) { modal.classList.add('opacity-0'); panel.classList.add('scale-95'); setTimeout(() => { modal.classList.add('hidden'); if(content) content.innerHTML = ''; }, 300); }
         };
 
-        function renderVideo() {
+        window.renderVideo = function(resetPage = false) {
+            if(resetPage) videoPage = 1;
             const container = document.getElementById('admin-video-container');
+            const paginationUI = document.getElementById('video-pagination');
             if(!container) return;
-            if(state.videos.length === 0) { container.innerHTML = `<div class="p-6 text-center bg-white border border-slate-200 rounded-xl text-gray-400 text-sm">Video masih kosong.</div>`; return; }
-            container.innerHTML = state.videos.map(v => {
+            
+            const sortedVideos = [...state.videos].sort((a,b) => new Date(b.tanggal || 0) - new Date(a.tanggal || 0));
+            const totalItems = sortedVideos.length;
+
+            if(totalItems === 0) { 
+                container.innerHTML = `<div class="p-6 text-center bg-white border border-slate-200 rounded-xl text-gray-400 text-sm">Video masih kosong.</div>`; 
+                if(paginationUI) { paginationUI.classList.add('hidden'); paginationUI.classList.remove('flex'); }
+                return; 
+            }
+
+            const totalPages = Math.ceil(totalItems / videoLimit);
+            if(videoPage > totalPages) videoPage = totalPages;
+            const startIndex = (videoPage - 1) * videoLimit;
+            const pagedVideos = sortedVideos.slice(startIndex, startIndex + videoLimit);
+
+            container.innerHTML = pagedVideos.map(v => {
                 let thumbUrl = ''; 
                 if (v.url) { 
-                    const ytMatch = v.url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/); 
-                    if (ytMatch && ytMatch[2].length === 11) thumbUrl = `https://img.youtube.com/vi/${ytMatch[2]}/hqdefault.jpg`; 
+                    // Rumus yang sama untuk Thumbnail
+                    const ytMatch = v.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
+                    if (ytMatch && ytMatch[1]) thumbUrl = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`; 
                 }
                 const finalThumb = thumbUrl || 'https://images.unsplash.com/photo-1609599006353-e629aaab31f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
                 
@@ -809,7 +827,14 @@
                     </div>
                 </div>`;
             }).join('');
-        }
+
+            if(paginationUI) {
+                paginationUI.classList.remove('hidden'); paginationUI.classList.add('flex');
+                if(document.getElementById('video-page-info')) document.getElementById('video-page-info').innerText = `${videoPage} / ${totalPages}`;
+                if(document.getElementById('btn-prev-video')) document.getElementById('btn-prev-video').disabled = videoPage === 1;
+                if(document.getElementById('btn-next-video')) document.getElementById('btn-next-video').disabled = videoPage === totalPages;
+            }
+        };
 
         let editVideoId = null;
         window.editVideo = function(id) {
