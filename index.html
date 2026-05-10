@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Setoran Hafalan - Admin Panel</title>
     
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0ea5e9">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -210,7 +217,26 @@
                     <span class="text-[10px] font-bold">Video</span>
                 </button>
             </nav>
+            
         </div>
+
+        <!-- PROMPT INSTALL APLIKASI (PWA Banner) -->
+        <div id="install-prompt" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 w-[90%] max-w-[360px] bg-slate-900 text-white p-4 rounded-2xl shadow-2xl z-[100] hidden flex-col gap-3 transition-opacity duration-300 border border-slate-700">
+            <div class="flex items-center gap-4">
+                <div class="bg-gradient-to-br from-sky-400 to-primary w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg shrink-0">
+                    <i class="fas fa-download text-xl"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm tracking-wide">Install Portal Admin</h4>
+                    <p class="text-[11px] text-slate-300 mt-0.5 leading-snug">Pasang di layar utama untuk akses cepat!</p>
+                </div>
+            </div>
+            <div class="flex gap-2 mt-1">
+                <button id="btn-install-yes" class="flex-1 bg-primary hover:bg-sky-600 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-md shadow-primary/20">Install Sekarang</button>
+                <button id="btn-install-no" class="px-5 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold py-2.5 rounded-xl transition">Nanti</button>
+            </div>
+        </div>
+
     </div>
 
     <!-- Notification Toast -->
@@ -636,6 +662,57 @@
             toast.classList.remove('-translate-y-[200%]', 'opacity-0'); 
             setTimeout(() => toast.classList.add('-translate-y-[200%]', 'opacity-0'), 3000);
         };
+
+        // --- Fitur PWA Install Banner & Service Worker Logic ---
+        let deferredPrompt;
+        const installPromptEl = document.getElementById('install-prompt');
+        const btnInstallYes = document.getElementById('btn-install-yes');
+        const btnInstallNo = document.getElementById('btn-install-no');
+
+        // Menangkap event sebelum browser menawarkan install
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Tampilkan custom banner kita setelah 3 detik
+            setTimeout(() => {
+                installPromptEl.classList.remove('hidden');
+                installPromptEl.classList.add('flex');
+            }, 3000); 
+        });
+
+        // Jika tombol Install ditekan
+        btnInstallYes.addEventListener('click', async () => {
+            installPromptEl.classList.add('hidden');
+            installPromptEl.classList.remove('flex');
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+            }
+        });
+
+        // Jika tombol Nanti ditekan
+        btnInstallNo.addEventListener('click', () => {
+            installPromptEl.classList.add('hidden');
+            installPromptEl.classList.remove('flex');
+        });
+
+        // Mendaftarkan Service Worker untuk Admin
+        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(reg => {
+                    reg.addEventListener('updatefound', () => {
+                        const newWorker = reg.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                window.showToast("Pembaruan aplikasi tersedia! Memuat ulang...", "success");
+                                setTimeout(() => window.location.reload(), 2000);
+                            }
+                        });
+                    });
+                }).catch(err => console.warn('Pendaftaran ServiceWorker dilewati:', err));
+            });
+        }
     </script>
 </body>
 </html>
