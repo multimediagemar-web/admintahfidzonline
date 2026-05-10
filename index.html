@@ -747,34 +747,26 @@
 
         window.deleteJadwal = async function(id) { if (!currentUser) return; if(confirm("Hapus jadwal ini?")) { try { await deleteDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'schedules', id)); window.showToast("Jadwal dihapus"); } catch (e) {} } };
 
-        // --- Fitur Video ---
-        window.openVideoModal = function(url, title) {
-            const modal = document.getElementById('video-modal'); 
-            const panel = document.getElementById('video-modal-panel'); 
-            const content = document.getElementById('video-modal-content'); 
-            const titleEl = document.getElementById('video-modal-title');
-            
-            if(titleEl) titleEl.innerText = title || "Kajian"; 
-            let embedUrl = url; 
-            
-            // Rumus baru yang lebih pintar untuk mendeteksi berbagai jenis URL YouTube termasuk Shorts
-            const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
-            
-            if (ytMatch && ytMatch[1]) {
-                embedUrl = `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0`; 
-            } else if (url.includes('drive.google.com')) {
-                embedUrl = url.replace(/\/view.*$/, '/preview');
+        // Fungsi pendeteksi ID YouTube yang tangguh untuk semua format URL (Shorts, Mobile, Live Streaming dll)
+        function getYoutubeId(url) {
+            if (!url) return null;
+            const regExp = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/|live\/))([\w-]{11})/;
+            const match = url.match(regExp);
+            return (match && match[1]) ? match[1] : null;
+        }
+
+        // --- Fitur Video & Pagination ---
+        window.changeVideoLimit = function() {
+            const limitEl = document.getElementById('video-limit');
+            if(limitEl) {
+                videoLimit = parseInt(limitEl.value);
+                renderVideo(true);
             }
-            
-            if(content) content.innerHTML = `<iframe class="w-full h-full" src="${embedUrl}" title="${title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-            if(modal && panel) { modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); panel.classList.remove('scale-95'); }, 10); }
         };
-        
-        window.closeVideoModal = function() { 
-            const modal = document.getElementById('video-modal'); 
-            const panel = document.getElementById('video-modal-panel'); 
-            const content = document.getElementById('video-modal-content'); 
-            if(modal && panel) { modal.classList.add('opacity-0'); panel.classList.add('scale-95'); setTimeout(() => { modal.classList.add('hidden'); if(content) content.innerHTML = ''; }, 300); }
+
+        window.changeVideoPage = function(dir) {
+            videoPage += dir;
+            renderVideo(false);
         };
 
         window.renderVideo = function(resetPage = false) {
@@ -798,34 +790,14 @@
             const pagedVideos = sortedVideos.slice(startIndex, startIndex + videoLimit);
 
             container.innerHTML = pagedVideos.map(v => {
-                let thumbUrl = ''; 
-                if (v.url) { 
-                    // Rumus yang sama untuk Thumbnail
-                    const ytMatch = v.url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
-                    if (ytMatch && ytMatch[1]) thumbUrl = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`; 
+                let thumbUrl = v.thumbnail; 
+                if (!thumbUrl && v.url) { 
+                    const ytId = getYoutubeId(v.url);
+                    if (ytId) thumbUrl = `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`; 
                 }
                 const finalThumb = thumbUrl || 'https://images.unsplash.com/photo-1609599006353-e629aaab31f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
                 
-                return `
-                <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col">
-                    <div class="absolute top-2 right-2 flex gap-1 z-20">
-                        <button onclick="editVideo('${v.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-edit text-sm"></i></button>
-                        <button onclick="deleteVideo('${v.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-trash text-sm"></i></button>
-                    </div>
-                    <div class="h-44 w-full bg-slate-200 relative group cursor-pointer" onclick="openVideoModal('${v.url}', '${v.title.replace(/'/g, "\\'")}')">
-                        <img src="${finalThumb}" class="w-full h-full object-cover transition transform group-hover:scale-105 duration-700">
-                        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition"></div>
-                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
-                            <div class="w-10 h-10 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white pl-1 border border-white/40 shadow-lg"><i class="fas fa-play"></i></div>
-                        </div>
-                        <div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded">${v.durasi || '00:00'}</div>
-                    </div>
-                    <div class="p-4">
-                        <span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-2 inline-block ${v.kategori === 'Tahfidz' ? 'bg-emerald-500' : v.kategori === 'Tahsin' ? 'bg-blue-500' : 'bg-slate-800'}">${v.kategori || 'Kajian'}</span>
-                        <h4 class="font-bold text-base mb-1 pr-8 text-slate-800 leading-tight hover:text-primary cursor-pointer transition" onclick="openVideoModal('${v.url}', '${v.title.replace(/'/g, "\\'")}')">${v.title}</h4>
-                        <p class="text-xs text-slate-500"><i class="far fa-calendar-alt w-4"></i> ${v.tanggal || '-'}</p>
-                    </div>
-                </div>`;
+                return `<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col"><div class="absolute top-2 right-2 flex gap-1 z-20"><button onclick="editVideo('${v.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-edit text-sm"></i></button><button onclick="deleteVideo('${v.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-trash text-sm"></i></button></div><div class="h-32 w-full bg-slate-200 relative cursor-pointer group" onclick="openVideoModal('${v.url}', '${v.title.replace(/'/g, "\\'")}')"><img src="${finalThumb}" class="w-full h-full object-cover transition transform group-hover:scale-105 duration-700"><div class="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition"></div><div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><div class="w-10 h-10 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white pl-1 border border-white/40 shadow-lg"><i class="fas fa-play"></i></div></div><div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded">${v.durasi || '00:00'}</div></div><div class="p-3"><span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-1 inline-block ${v.kategori === 'Tahfidz' ? 'bg-emerald-500' : v.kategori === 'Tahsin' ? 'bg-blue-500' : 'bg-slate-800'}">${v.kategori || 'Kajian'}</span><h4 class="font-bold text-sm text-slate-800 leading-snug line-clamp-2 cursor-pointer hover:text-primary transition" onclick="openVideoModal('${v.url}', '${v.title.replace(/'/g, "\\'")}')">${v.title}</h4><p class="text-[10px] text-slate-500 mt-1"><i class="far fa-calendar-alt"></i> ${v.tanggal || '-'}</p></div></div>`;
             }).join('');
 
             if(paginationUI) {
@@ -860,7 +832,7 @@
             if (!currentUser) return;
             const titleEl = document.getElementById('v-judul'); const kategoriEl = document.getElementById('v-kategori'); 
             const tanggalEl = document.getElementById('v-tanggal'); const durasiEl = document.getElementById('v-durasi'); 
-            const urlEl = document.getElementById('v-url'); 
+            const urlEl = document.getElementById('v-url');
 
             const title = titleEl ? titleEl.value : ''; const kategori = kategoriEl ? kategoriEl.value : 'Tahfidz'; 
             const tanggal = tanggalEl ? tanggalEl.value : ''; const durasi = durasiEl ? durasiEl.value : ''; 
@@ -868,7 +840,6 @@
 
             if(!title || !url || !tanggal) return window.showToast("Harap isi judul, tanggal, dan URL!", "error");
             try {
-                // Thumbnail dikosongkan karena ditarik otomatis dari YouTube
                 const videoData = { title, kategori, tanggal, durasi, url, thumbnail: '' };
                 if (editVideoId) { 
                     await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'videos', editVideoId), videoData, { merge: true }); 
@@ -893,6 +864,35 @@
         };
 
         window.deleteVideo = async function(id) { if (!currentUser) return; if(confirm("Hapus video ini?")) { try { await deleteDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'videos', id)); window.showToast("Video dihapus"); } catch (e) {} } };
+
+        // Tambahkan fungsi Modal untuk memutar video langsung
+        window.openVideoModal = function(url, title) {
+            const modal = document.getElementById('video-modal'); 
+            const panel = document.getElementById('video-modal-panel'); 
+            const content = document.getElementById('video-modal-content'); 
+            const titleEl = document.getElementById('video-modal-title');
+            
+            if(titleEl) titleEl.innerText = title || "Kajian"; 
+            let embedUrl = url; 
+            
+            const ytId = getYoutubeId(url);
+            if (ytId) {
+                embedUrl = `https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0`; 
+            } else if (url.includes('drive.google.com')) {
+                embedUrl = url.replace(/\/view.*$/, '/preview');
+            }
+            
+            if(content) content.innerHTML = `<iframe class="w-full h-full" src="${embedUrl}" title="${title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            if(modal && panel) { modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); panel.classList.remove('scale-95'); }, 10); }
+        };
+        
+        window.closeVideoModal = function() { 
+            const modal = document.getElementById('video-modal'); 
+            const panel = document.getElementById('video-modal-panel'); 
+            const content = document.getElementById('video-modal-content'); 
+            if(modal && panel) { modal.classList.add('opacity-0'); panel.classList.add('scale-95'); setTimeout(() => { modal.classList.add('hidden'); if(content) content.innerHTML = ''; }, 300); }
+        };
+        document.getElementById('video-modal')?.addEventListener('click', function(e) { if(e.target === this) window.closeVideoModal(); });
 
         window.showToast = function(msg, type="success") {
             const toast = document.getElementById('toast'); const toastIconBg = document.getElementById('toast-icon-bg'); const toastIcon = document.getElementById('toast-icon');
