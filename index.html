@@ -55,6 +55,7 @@
             
             <div class="mt-6 text-center pb-6 shrink-0">
                 <p class="text-[10px] text-slate-400">Pastikan email Anda sudah ditambahkan oleh Super Admin ke dalam Database Firebase Collection `admin_users`.</p>
+                <p class="text-[10px] text-slate-400 mt-2 font-medium">Portal ini dibuat untuk <span class="font-bold text-primary">Masjid Ashqaf</span></p>
             </div>
         </div>
 
@@ -65,7 +66,6 @@
             <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50 rounded-b-xl">
                 <div class="px-5 py-4 flex justify-between items-center">
                     <div class="flex items-center gap-3"><i class="fas fa-shield-alt text-2xl text-primary drop-shadow-md"></i><h1 class="text-xl font-bold tracking-wide">Admin Hafalan</h1></div>
-                    <button onclick="handleLogout()" class="text-xs font-bold text-red-400 hover:text-red-300 transition"><i class="fas fa-sign-out-alt"></i> Keluar</button>
                 </div>
             </header>
 
@@ -74,7 +74,12 @@
                 <!-- Tab: Review Setoran -->
                 <section id="tab-review" class="block animate-fade-in space-y-4">
                     <div class="flex justify-between items-center border-b pb-2">
-                        <div><h2 class="text-xl font-bold text-slate-800">Review Setoran</h2><p id="admin-email-display" class="text-[10px] text-slate-500 font-medium">Logged in as: </p></div>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">Review Setoran</h2>
+                            <p id="admin-email-display" class="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+                                <i class="fas fa-spinner fa-spin text-primary"></i> Memuat akses...
+                            </p>
+                        </div>
                         <button onclick="loadSetoran()" class="text-primary hover:text-secondary text-sm font-medium"><i class="fas fa-sync-alt"></i> Refresh</button>
                     </div>
 
@@ -116,7 +121,9 @@
                     </div>
 
                     <!-- Daftar Setoran (Mengikuti Filter & Pagination) -->
-                    <div id="admin-setoran-container" class="space-y-4"></div>
+                    <div id="admin-setoran-container" class="space-y-4">
+                        <div class="flex flex-col items-center justify-center py-8 gap-3"><i class="fas fa-spinner fa-spin text-3xl text-primary"></i><span class="text-xs text-slate-400 font-medium">Memuat data setoran...</span></div>
+                    </div>
 
                     <!-- Pagination Setoran -->
                     <div id="review-pagination" class="hidden justify-between items-center mt-4 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
@@ -171,7 +178,9 @@
                             <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs"></i>
                             <input type="text" id="search-peserta" onkeyup="renderPeserta()" placeholder="Cari nama peserta..." class="w-full bg-white border border-slate-200 rounded-lg py-2 pl-8 pr-3 text-xs outline-none focus:ring-1 focus:ring-primary shadow-sm">
                         </div>
-                        <div id="admin-peserta-container" class="space-y-3"></div>
+                        <div id="admin-peserta-container" class="space-y-3">
+                            <div class="flex flex-col items-center justify-center py-8 gap-3"><i class="fas fa-spinner fa-spin text-3xl text-primary"></i><span class="text-xs text-slate-400 font-medium">Memuat data peserta...</span></div>
+                        </div>
                     </div>
                 </section>
 
@@ -195,7 +204,9 @@
                         </div>
                         <button id="btn-submit-jadwal" onclick="addJadwal()" class="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg transition text-xs shadow-sm">Simpan Jadwal</button>
                     </div>
-                    <div id="admin-jadwal-container" class="space-y-4"></div>
+                    <div id="admin-jadwal-container" class="space-y-4">
+                        <div class="flex flex-col items-center justify-center py-8 gap-3"><i class="fas fa-spinner fa-spin text-3xl text-primary"></i><span class="text-xs text-slate-400 font-medium">Memuat daftar jadwal...</span></div>
+                    </div>
                 </section>
 
                 <!-- Tab: Kelola Video Kajian -->
@@ -213,12 +224,14 @@
                                 <div><label class="block text-xs font-medium mb-1 text-slate-500">Durasi</label><input type="text" id="v-durasi" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary" placeholder="12:30"></div>
                                 <div><label class="block text-xs font-medium mb-1 text-slate-500">Link Video (YT/Drive)</label><input type="url" id="v-url" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary" placeholder="https://..."></div>
                             </div>
-                            <div><label class="block text-xs font-medium mb-1 text-slate-500">Link Thumbnail (Gambar)</label><input type="url" id="v-thumbnail" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary" placeholder="https://..."></div>
+                            <div><label class="block text-xs font-medium mb-1 text-slate-500">Link Thumbnail (Gambar)</label><input type="url" id="v-thumbnail" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary" placeholder="Otomatis jika link YouTube kosongkan saja"></div>
                         </div>
                         <button id="btn-submit-video" onclick="addVideo()" class="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg transition text-xs shadow-sm">Tambah Video</button>
                     </div>
 
-                    <div id="admin-video-container" class="space-y-4"></div>
+                    <div id="admin-video-container" class="space-y-4">
+                        <div class="flex flex-col items-center justify-center py-8 gap-3"><i class="fas fa-spinner fa-spin text-3xl text-primary"></i><span class="text-xs text-slate-400 font-medium">Memuat data video...</span></div>
+                    </div>
 
                     <!-- Pagination Video -->
                     <div id="video-pagination" class="hidden justify-between items-center mt-4 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
@@ -254,6 +267,11 @@
                             <i class="fas fa-save"></i> Simpan Pengaturan
                         </button>
                     </div>
+
+                    <!-- Tombol Keluar Refresh -->
+                    <button onclick="handleLogout()" class="w-full bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 rounded-2xl transition shadow-lg flex items-center justify-center gap-2 mt-6 border border-rose-600">
+                        <i class="fas fa-sign-out-alt text-lg"></i> Keluar Akun Admin
+                    </button>
                 </section>
 
             </main>
@@ -312,12 +330,14 @@
                     const adminCheck = await getDoc(doc(db, 'admin_users', user.email));
                     if(adminCheck.exists()) {
                         currentUser = user;
-                        document.getElementById('auth-page').classList.add('-translate-x-full');
+                        const authPage = document.getElementById('auth-page');
+                        if(authPage) authPage.classList.add('-translate-x-full');
                         setTimeout(() => {
-                            document.getElementById('auth-page').classList.add('hidden');
-                            document.getElementById('app-content').classList.remove('hidden');
-                            document.getElementById('app-content').classList.add('flex');
-                            document.getElementById('admin-email-display').innerText = `Admin: ${user.email}`;
+                            if(authPage) authPage.classList.add('hidden');
+                            const appContent = document.getElementById('app-content');
+                            if(appContent) { appContent.classList.remove('hidden'); appContent.classList.add('flex'); }
+                            const emailDisp = document.getElementById('admin-email-display');
+                            if(emailDisp) emailDisp.innerText = `Admin: ${user.email}`;
                             loadAdminSettings();
                         }, 500);
                         setupListeners();
@@ -327,33 +347,50 @@
                 } catch (e) { await signOut(auth); showToast("Gagal memverifikasi akses.", "error"); }
             } else {
                 currentUser = null;
-                document.getElementById('app-content').classList.add('hidden');
-                document.getElementById('app-content').classList.remove('flex');
-                document.getElementById('auth-page').classList.remove('hidden');
-                setTimeout(() => { document.getElementById('auth-page').classList.remove('-translate-x-full'); }, 10);
+                const appContent = document.getElementById('app-content');
+                if(appContent) { appContent.classList.add('hidden'); appContent.classList.remove('flex'); }
+                const authPage = document.getElementById('auth-page');
+                if(authPage) authPage.classList.remove('hidden');
+                setTimeout(() => { if(authPage) authPage.classList.remove('-translate-x-full'); }, 10);
             }
         });
 
         window.handleLogin = async function() {
-            const email = document.getElementById('auth-email').value; const pass = document.getElementById('auth-password').value;
+            const emailEl = document.getElementById('auth-email');
+            const passEl = document.getElementById('auth-password');
+            const email = emailEl ? emailEl.value : '';
+            const pass = passEl ? passEl.value : '';
+            
             if(!email || !pass) return showToast("Email dan password wajib diisi", "error");
-            try { await signInWithEmailAndPassword(auth, email, pass); showToast("Mengecek verifikasi admin..."); } catch(e) { showToast("Gagal login! Periksa kembali data Anda.", "error"); }
+            try { 
+                await signInWithEmailAndPassword(auth, email, pass); 
+                showToast("Mengecek verifikasi admin..."); 
+            } catch(e) { 
+                showToast("Gagal login! Periksa kembali data Anda.", "error"); 
+            }
         };
 
-        window.handleLogout = async function() { try { await signOut(auth); document.getElementById('auth-email').value = ''; document.getElementById('auth-password').value = ''; showToast("Berhasil keluar."); } catch(e) {} };
+        window.handleLogout = async function() { 
+            try { 
+                await signOut(auth); 
+                window.location.reload(); // Refresh menyeluruh agar sesi bersih
+            } catch(e) {} 
+        };
 
         // --- Fitur Pengaturan ---
         async function loadAdminSettings() {
             try {
                 const docSnap = await getDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'settings', 'admin_profile'));
                 if (docSnap.exists() && docSnap.data().wa_number) {
-                    document.getElementById('setting-wa').value = docSnap.data().wa_number;
+                    const waInput = document.getElementById('setting-wa');
+                    if(waInput) waInput.value = docSnap.data().wa_number;
                 }
             } catch (e) { console.error("Error loading settings", e); }
         }
 
         window.saveSettings = async function() {
-            const wa = document.getElementById('setting-wa').value;
+            const waInput = document.getElementById('setting-wa');
+            const wa = waInput ? waInput.value : '';
             if(!wa) return showToast("Nomor WA wajib diisi", "error");
             try {
                 await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'settings', 'admin_profile'), { wa_number: wa }, {merge: true});
@@ -365,32 +402,42 @@
             if (!currentUser) return;
             onSnapshot(collection(db, 'artifacts', appIdGlobal, 'public', 'data', 'setoran'), (snap) => {
                 state.setoran = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                if(document.getElementById('tab-review').classList.contains('block')) renderSetoran();
-                if(document.getElementById('tab-peserta').classList.contains('block')) renderPeserta();
+                const tabReview = document.getElementById('tab-review');
+                const tabPeserta = document.getElementById('tab-peserta');
+                if(tabReview && tabReview.classList.contains('block')) renderSetoran();
+                if(tabPeserta && tabPeserta.classList.contains('block')) renderPeserta();
             });
             onSnapshot(collection(db, 'artifacts', appIdGlobal, 'public', 'data', 'schedules'), (snap) => {
                 state.schedules = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                if(document.getElementById('tab-jadwal').classList.contains('block')) renderJadwal();
+                const tabJadwal = document.getElementById('tab-jadwal');
+                if(tabJadwal && tabJadwal.classList.contains('block')) renderJadwal();
             });
             onSnapshot(collection(db, 'artifacts', appIdGlobal, 'public', 'data', 'videos'), (snap) => {
                 state.videos = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                if(document.getElementById('tab-video').classList.contains('block')) renderVideo();
+                const tabVideo = document.getElementById('tab-video');
+                if(tabVideo && tabVideo.classList.contains('block')) renderVideo();
             });
             onSnapshot(collection(db, 'artifacts', appIdGlobal, 'public', 'data', 'peserta'), (snap) => {
                 state.peserta = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                if(document.getElementById('tab-peserta').classList.contains('block')) renderPeserta();
+                const tabPeserta = document.getElementById('tab-peserta');
+                if(tabPeserta && tabPeserta.classList.contains('block')) renderPeserta();
             });
         }
 
         window.switchTab = function(tabId) {
             document.querySelectorAll('section').forEach(sec => { sec.classList.remove('block'); sec.classList.add('hidden'); });
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden'); document.getElementById(`tab-${tabId}`).classList.add('block');
+            const tabEl = document.getElementById(`tab-${tabId}`);
+            if(tabEl) { tabEl.classList.remove('hidden'); tabEl.classList.add('block'); }
+            
             ['review', 'peserta', 'jadwal', 'video', 'pengaturan'].forEach(nav => {
-                const el = document.getElementById(`nav-mobile-${nav}`);
-                if(nav === tabId) {
-                    if(nav === 'jadwal') { el.classList.add('text-slate-900'); el.classList.remove('text-slate-400'); } else { el.classList.add('text-primary'); el.classList.remove('text-slate-400'); }
-                } else {
-                    el.classList.remove('text-primary', 'text-slate-900'); el.classList.add('text-slate-400');
+                const elBtn = document.getElementById(`nav-mobile-${nav}`);
+                if(elBtn) {
+                    if(nav === tabId) {
+                        if(nav === 'jadwal') { elBtn.classList.add('text-slate-900'); elBtn.classList.remove('text-slate-400'); } 
+                        else { elBtn.classList.add('text-primary'); elBtn.classList.remove('text-slate-400'); }
+                    } else {
+                        elBtn.classList.remove('text-primary', 'text-slate-900'); elBtn.classList.add('text-slate-400');
+                    }
                 }
             });
             if(tabId === 'review') renderSetoran(); if(tabId === 'jadwal') renderJadwal(); if(tabId === 'video') renderVideo(); if(tabId === 'peserta') renderPeserta();
@@ -400,18 +447,26 @@
         let editPesertaId = null;
 
         window.togglePasswordVisibility = function() {
-            if(document.getElementById('p-existing-auth').checked) {
-                document.getElementById('p-password-container').classList.add('hidden');
+            const checkEl = document.getElementById('p-existing-auth');
+            const passContainer = document.getElementById('p-password-container');
+            if(checkEl && checkEl.checked) {
+                if(passContainer) passContainer.classList.add('hidden');
             } else {
-                document.getElementById('p-password-container').classList.remove('hidden');
+                if(passContainer) passContainer.classList.remove('hidden');
             }
         };
 
         window.savePeserta = async function() {
-            const sapaan = document.getElementById('p-sapaan').value; const nama = document.getElementById('p-nama').value;
-            const email = document.getElementById('p-email').value; const password = document.getElementById('p-password').value;
-            const wa = document.getElementById('p-wa').value;
-            const isExisting = document.getElementById('p-existing-auth').checked;
+            const sapaanEl = document.getElementById('p-sapaan'); const namaEl = document.getElementById('p-nama');
+            const emailEl = document.getElementById('p-email'); const passEl = document.getElementById('p-password');
+            const waEl = document.getElementById('p-wa'); const existEl = document.getElementById('p-existing-auth');
+
+            const sapaan = sapaanEl ? sapaanEl.value : 'Kak'; 
+            const nama = namaEl ? namaEl.value : '';
+            const email = emailEl ? emailEl.value : ''; 
+            const password = passEl ? passEl.value : '';
+            const wa = waEl ? waEl.value : '';
+            const isExisting = existEl ? existEl.checked : false;
 
             if(!nama || !email || !wa) return showToast("Harap isi nama, email, dan WA!", "error");
 
@@ -436,36 +491,47 @@
 
         window.editPeserta = function(id) {
             const p = state.peserta.find(x => x.id === id); if(!p) return;
-            document.getElementById('p-sapaan').value = p.sapaan || 'Kak';
-            document.getElementById('p-nama').value = p.nama || '';
-            document.getElementById('p-email').value = p.email || '';
-            document.getElementById('p-wa').value = p.wa || '';
             
-            document.getElementById('p-password-container').classList.add('hidden');
-            document.getElementById('p-existing-auth-container').classList.add('hidden');
+            if(document.getElementById('p-sapaan')) document.getElementById('p-sapaan').value = p.sapaan || 'Kak';
+            if(document.getElementById('p-nama')) document.getElementById('p-nama').value = p.nama || '';
+            if(document.getElementById('p-email')) document.getElementById('p-email').value = p.email || '';
+            if(document.getElementById('p-wa')) document.getElementById('p-wa').value = p.wa || '';
+            
+            if(document.getElementById('p-password-container')) document.getElementById('p-password-container').classList.add('hidden');
+            if(document.getElementById('p-existing-auth-container')) document.getElementById('p-existing-auth-container').classList.add('hidden');
             
             editPesertaId = id;
-            document.getElementById('btn-submit-peserta').innerText = "Update Profil Peserta";
-            document.getElementById('btn-submit-peserta').classList.replace('bg-slate-900', 'bg-blue-600');
-            document.getElementById('btn-submit-peserta').classList.replace('hover:bg-slate-800', 'hover:bg-blue-700');
-            document.getElementById('btn-cancel-edit-peserta').classList.remove('hidden');
-            document.getElementById('form-peserta-title').innerHTML = `<i class="fas fa-user-edit text-primary mr-1"></i> Edit Profil Peserta`;
-            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+            const btnSubmit = document.getElementById('btn-submit-peserta');
+            if(btnSubmit) {
+                btnSubmit.innerText = "Update Profil Peserta";
+                btnSubmit.classList.replace('bg-slate-900', 'bg-blue-600');
+                btnSubmit.classList.replace('hover:bg-slate-800', 'hover:bg-blue-700');
+            }
+            if(document.getElementById('btn-cancel-edit-peserta')) document.getElementById('btn-cancel-edit-peserta').classList.remove('hidden');
+            if(document.getElementById('form-peserta-title')) document.getElementById('form-peserta-title').innerHTML = `<i class="fas fa-user-edit text-primary mr-1"></i> Edit Profil Peserta`;
+            const mainEl = document.querySelector('main');
+            if(mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         window.resetPesertaForm = function() {
-            document.getElementById('p-nama').value = ''; document.getElementById('p-email').value = ''; 
-            document.getElementById('p-password').value = ''; document.getElementById('p-wa').value = '';
-            document.getElementById('p-existing-auth').checked = false;
-            document.getElementById('p-password-container').classList.remove('hidden');
-            document.getElementById('p-existing-auth-container').classList.remove('hidden');
+            if(document.getElementById('p-nama')) document.getElementById('p-nama').value = ''; 
+            if(document.getElementById('p-email')) document.getElementById('p-email').value = ''; 
+            if(document.getElementById('p-password')) document.getElementById('p-password').value = ''; 
+            if(document.getElementById('p-wa')) document.getElementById('p-wa').value = '';
+            if(document.getElementById('p-existing-auth')) document.getElementById('p-existing-auth').checked = false;
+            
+            if(document.getElementById('p-password-container')) document.getElementById('p-password-container').classList.remove('hidden');
+            if(document.getElementById('p-existing-auth-container')) document.getElementById('p-existing-auth-container').classList.remove('hidden');
             
             editPesertaId = null;
-            document.getElementById('btn-submit-peserta').innerText = "Buat Akun & Simpan Profil";
-            document.getElementById('btn-submit-peserta').classList.replace('bg-blue-600', 'bg-slate-900');
-            document.getElementById('btn-submit-peserta').classList.replace('hover:bg-blue-700', 'hover:bg-slate-800');
-            document.getElementById('btn-cancel-edit-peserta').classList.add('hidden');
-            document.getElementById('form-peserta-title').innerHTML = `<i class="fas fa-user-plus text-primary mr-1"></i> Pendaftar Baru`;
+            const btnSubmit = document.getElementById('btn-submit-peserta');
+            if(btnSubmit) {
+                btnSubmit.innerText = "Buat Akun & Simpan Profil";
+                btnSubmit.classList.replace('bg-blue-600', 'bg-slate-900');
+                btnSubmit.classList.replace('hover:bg-blue-700', 'hover:bg-slate-800');
+            }
+            if(document.getElementById('btn-cancel-edit-peserta')) document.getElementById('btn-cancel-edit-peserta').classList.add('hidden');
+            if(document.getElementById('form-peserta-title')) document.getElementById('form-peserta-title').innerHTML = `<i class="fas fa-user-plus text-primary mr-1"></i> Pendaftar Baru`;
         };
 
         window.deletePeserta = async function(id) {
@@ -488,7 +554,9 @@
 
         window.renderPeserta = function() {
             const container = document.getElementById('admin-peserta-container');
-            const search = document.getElementById('search-peserta') ? document.getElementById('search-peserta').value.toLowerCase() : '';
+            if(!container) return;
+            const searchEl = document.getElementById('search-peserta');
+            const search = searchEl ? searchEl.value.toLowerCase() : '';
             
             const filteredPeserta = state.peserta.filter(p => p.nama.toLowerCase().includes(search) || p.email.toLowerCase().includes(search)).sort((a,b) => b.id - a.id);
 
@@ -517,8 +585,11 @@
         window.loadSetoran = function() { renderSetoran(true); };
 
         window.changeReviewLimit = function() {
-            reviewLimit = parseInt(document.getElementById('review-limit').value);
-            renderSetoran(true); // reset page ke 1
+            const limitEl = document.getElementById('review-limit');
+            if(limitEl) {
+                reviewLimit = parseInt(limitEl.value);
+                renderSetoran(true); // reset page ke 1
+            }
         };
 
         window.changeReviewPage = function(dir) {
@@ -530,13 +601,18 @@
             if(resetPage) reviewPage = 1;
             const container = document.getElementById('admin-setoran-container');
             const paginationUI = document.getElementById('review-pagination');
+            if(!container) return;
             
-            const search = document.getElementById('filter-search') ? document.getElementById('filter-search').value.toLowerCase() : '';
-            const status = document.getElementById('filter-status') ? document.getElementById('filter-status').value : 'Semua';
-            const startDate = document.getElementById('filter-start-date') ? document.getElementById('filter-start-date').value : '';
-            const startTime = document.getElementById('filter-start-time') ? document.getElementById('filter-start-time').value : '';
-            const endDate = document.getElementById('filter-end-date') ? document.getElementById('filter-end-date').value : '';
-            const endTime = document.getElementById('filter-end-time') ? document.getElementById('filter-end-time').value : '';
+            const searchEl = document.getElementById('filter-search'); const statusEl = document.getElementById('filter-status');
+            const startDateEl = document.getElementById('filter-start-date'); const startTimeEl = document.getElementById('filter-start-time');
+            const endDateEl = document.getElementById('filter-end-date'); const endTimeEl = document.getElementById('filter-end-time');
+
+            const search = searchEl ? searchEl.value.toLowerCase() : '';
+            const status = statusEl ? statusEl.value : 'Semua';
+            const startDate = startDateEl ? startDateEl.value : '';
+            const startTime = startTimeEl ? startTimeEl.value : '';
+            const endDate = endDateEl ? endDateEl.value : '';
+            const endTime = endTimeEl ? endTimeEl.value : '';
 
             let startMs = 0; let endMs = Infinity;
             if(startDate) { const sTime = startTime || "00:00"; startMs = new Date(`${startDate}T${sTime}:00`).getTime(); }
@@ -551,11 +627,11 @@
             }).sort((a,b) => Number(b.id) - Number(a.id));
 
             const totalItems = filteredSetoran.length;
-            document.getElementById('rekap-count').innerText = totalItems;
+            if(document.getElementById('rekap-count')) document.getElementById('rekap-count').innerText = totalItems;
 
             if(totalItems === 0) { 
                 container.innerHTML = `<div class="p-8 text-center bg-white rounded-xl shadow-sm border border-slate-200 text-slate-400 text-sm">Data setoran tidak ditemukan.</div>`; 
-                paginationUI.classList.add('hidden'); paginationUI.classList.remove('flex');
+                if(paginationUI) { paginationUI.classList.add('hidden'); paginationUI.classList.remove('flex'); }
                 return; 
             }
 
@@ -578,16 +654,22 @@
                 return `<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3"><div class="flex justify-between items-start"><div><h3 class="font-bold text-sm text-slate-800 break-all">${s.user}</h3><p class="text-sm text-slate-600 font-medium">${s.surah}</p><p class="text-[10px] text-slate-400 mt-1"><i class="far fa-clock"></i> ${s.date}</p></div><span class="px-2 py-1 rounded text-[10px] font-bold text-white shadow-sm shrink-0 ${s.status === 'Menunggu Review' ? 'bg-yellow-500' : s.status === 'Diterima' ? 'bg-green-500' : 'bg-red-500'}">${s.status}</span></div><div class="w-full"><audio src="${s.audioBase64}" controls class="w-full h-10 mb-1"></audio>${catatanHtml}${btnHtml}</div></div>`;
             }).join('');
 
-            // Tampilkan dan update state Pagination UI
-            paginationUI.classList.remove('hidden'); paginationUI.classList.add('flex');
-            document.getElementById('review-page-info').innerText = `${reviewPage} / ${totalPages}`;
-            document.getElementById('btn-prev-review').disabled = reviewPage === 1;
-            document.getElementById('btn-next-review').disabled = reviewPage === totalPages;
+            if(paginationUI) {
+                paginationUI.classList.remove('hidden'); paginationUI.classList.add('flex');
+                if(document.getElementById('review-page-info')) document.getElementById('review-page-info').innerText = `${reviewPage} / ${totalPages}`;
+                if(document.getElementById('btn-prev-review')) document.getElementById('btn-prev-review').disabled = reviewPage === 1;
+                if(document.getElementById('btn-next-review')) document.getElementById('btn-next-review').disabled = reviewPage === totalPages;
+            }
         };
 
         window.updateSetoranStatus = async function(id, newStatus) {
             if (!currentUser) return;
-            try { const catatanEl = document.getElementById(`catatan-${id}`); const catatanValue = catatanEl ? catatanEl.value : ''; await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'setoran', id), { status: newStatus, catatan: catatanValue }, { merge: true }); window.showToast(`Status diubah menjadi: ${newStatus}`); } 
+            try { 
+                const catatanEl = document.getElementById(`catatan-${id}`); 
+                const catatanValue = catatanEl ? catatanEl.value : ''; 
+                await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'setoran', id), { status: newStatus, catatan: catatanValue }, { merge: true }); 
+                window.showToast(`Status diubah menjadi: ${newStatus}`); 
+            } 
             catch (e) { window.showToast("Gagal mengubah status", "error"); }
         };
 
@@ -601,6 +683,7 @@
         // --- Fitur Jadwal ---
         function renderJadwal() {
             const container = document.getElementById('admin-jadwal-container');
+            if(!container) return;
             if(state.schedules.length === 0) { container.innerHTML = `<div class="p-6 text-center bg-white border border-slate-200 rounded-xl text-gray-400 text-sm">Jadwal masih kosong.</div>`; return; }
             container.innerHTML = state.schedules.map(j => `<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col"><div class="absolute top-2 right-2 flex gap-1 z-10"><button onclick="editJadwal('${j.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-edit text-sm"></i></button><button onclick="deleteJadwal('${j.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-trash text-sm"></i></button></div><div class="h-32 w-full bg-slate-200 relative"><img src="${j.pamflet || 'https://brdsg.com/img/400/bq6rjfudbq7gvxva2d_1/LRa1FGRf9e5xfLcLRalHIayeLQhE5rRDMJEs7Knab8Q.webp'}" class="w-full h-full object-cover"></div><div class="p-4"><span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-2 inline-block ${j.type === 'Kajian' ? 'bg-primary' : 'bg-emerald-500'}">${j.type}</span><h4 class="font-bold text-base mb-1 pr-8 text-slate-800 leading-tight">${j.title}</h4><p class="text-xs text-slate-500"><i class="far fa-calendar-alt w-4"></i> ${j.date}</p><p class="text-xs text-slate-500"><i class="far fa-clock w-4"></i> ${j.time} ${j.timeEnd ? '- ' + j.timeEnd : ''} WIB</p><a href="${j.link}" target="_blank" class="text-xs text-primary font-medium mt-2 block truncate"><i class="fas fa-link w-4"></i> ${j.link}</a></div></div>`).join('');
         }
@@ -608,20 +691,59 @@
         let editJadwalId = null;
         window.editJadwal = function(id) {
             const sched = state.schedules.find(s => s.id === id); if (!sched) return;
-            document.getElementById('j-judul').value = sched.title || ''; document.getElementById('j-tipe').value = sched.type || 'Bimbingan'; document.getElementById('j-tanggal').value = sched.date || ''; document.getElementById('j-waktu').value = sched.time || ''; document.getElementById('j-waktu-selesai').value = sched.timeEnd || ''; document.getElementById('j-link').value = sched.link || ''; document.getElementById('j-pamflet').value = sched.pamflet || '';
-            editJadwalId = id; const btn = document.getElementById('btn-submit-jadwal'); btn.innerText = "Simpan Perubahan"; btn.classList.replace('bg-slate-900', 'bg-blue-600'); btn.classList.replace('hover:bg-slate-800', 'hover:bg-blue-700'); document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+            if(document.getElementById('j-judul')) document.getElementById('j-judul').value = sched.title || ''; 
+            if(document.getElementById('j-tipe')) document.getElementById('j-tipe').value = sched.type || 'Bimbingan'; 
+            if(document.getElementById('j-tanggal')) document.getElementById('j-tanggal').value = sched.date || ''; 
+            if(document.getElementById('j-waktu')) document.getElementById('j-waktu').value = sched.time || ''; 
+            if(document.getElementById('j-waktu-selesai')) document.getElementById('j-waktu-selesai').value = sched.timeEnd || ''; 
+            if(document.getElementById('j-link')) document.getElementById('j-link').value = sched.link || ''; 
+            if(document.getElementById('j-pamflet')) document.getElementById('j-pamflet').value = sched.pamflet || '';
+            
+            editJadwalId = id; 
+            const btn = document.getElementById('btn-submit-jadwal'); 
+            if(btn) {
+                btn.innerText = "Simpan Perubahan"; 
+                btn.classList.replace('bg-slate-900', 'bg-blue-600'); 
+                btn.classList.replace('hover:bg-slate-800', 'hover:bg-blue-700'); 
+            }
+            const mainEl = document.querySelector('main');
+            if(mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         window.addJadwal = async function() {
             if (!currentUser) return;
-            const title = document.getElementById('j-judul').value; const type = document.getElementById('j-tipe').value; const date = document.getElementById('j-tanggal').value; const time = document.getElementById('j-waktu').value; const timeEnd = document.getElementById('j-waktu-selesai').value; const link = document.getElementById('j-link').value; const pamflet = document.getElementById('j-pamflet').value;
+            const titleEl = document.getElementById('j-judul'); const typeEl = document.getElementById('j-tipe'); 
+            const dateEl = document.getElementById('j-tanggal'); const timeEl = document.getElementById('j-waktu'); 
+            const timeEndEl = document.getElementById('j-waktu-selesai'); const linkEl = document.getElementById('j-link'); 
+            const pamfletEl = document.getElementById('j-pamflet');
+
+            const title = titleEl ? titleEl.value : ''; const type = typeEl ? typeEl.value : 'Bimbingan'; 
+            const date = dateEl ? dateEl.value : ''; const time = timeEl ? timeEl.value : ''; 
+            const timeEnd = timeEndEl ? timeEndEl.value : ''; const link = linkEl ? linkEl.value : ''; 
+            const pamflet = pamfletEl ? pamfletEl.value : '';
+
             if(!title || !date || !time || !link) return window.showToast("Harap isi kolom wajib jadwal!", "error");
             try {
                 const jadwalData = { title, type, date, time, timeEnd, link, pamflet };
-                if (editJadwalId) { await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'schedules', editJadwalId), jadwalData, { merge: true }); window.showToast("Jadwal diupdate"); } 
-                else { const id = Date.now().toString(); await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'schedules', id), jadwalData); window.showToast("Jadwal ditambahkan"); }
-                document.getElementById('j-judul').value = ''; document.getElementById('j-tanggal').value = ''; document.getElementById('j-waktu').value = ''; document.getElementById('j-waktu-selesai').value = ''; document.getElementById('j-link').value = ''; document.getElementById('j-pamflet').value = '';
-                editJadwalId = null; const btn = document.getElementById('btn-submit-jadwal'); btn.innerText = "Simpan Jadwal"; btn.classList.replace('bg-blue-600', 'bg-slate-900'); btn.classList.replace('hover:bg-blue-700', 'hover:bg-slate-800');
+                if (editJadwalId) { 
+                    await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'schedules', editJadwalId), jadwalData, { merge: true }); 
+                    window.showToast("Jadwal diupdate"); 
+                } else { 
+                    const id = Date.now().toString(); 
+                    await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'schedules', id), jadwalData); 
+                    window.showToast("Jadwal ditambahkan"); 
+                }
+                
+                if(titleEl) titleEl.value = ''; if(dateEl) dateEl.value = ''; if(timeEl) timeEl.value = ''; 
+                if(timeEndEl) timeEndEl.value = ''; if(linkEl) linkEl.value = ''; if(pamfletEl) pamfletEl.value = '';
+                editJadwalId = null; 
+                
+                const btn = document.getElementById('btn-submit-jadwal'); 
+                if(btn) {
+                    btn.innerText = "Simpan Jadwal"; 
+                    btn.classList.replace('bg-blue-600', 'bg-slate-900'); 
+                    btn.classList.replace('hover:bg-blue-700', 'hover:bg-slate-800');
+                }
             } catch (e) { window.showToast("Gagal menyimpan jadwal", "error"); }
         };
 
@@ -629,8 +751,11 @@
 
         // --- Fitur Video & Pagination ---
         window.changeVideoLimit = function() {
-            videoLimit = parseInt(document.getElementById('video-limit').value);
-            renderVideo(true);
+            const limitEl = document.getElementById('video-limit');
+            if(limitEl) {
+                videoLimit = parseInt(limitEl.value);
+                renderVideo(true);
+            }
         };
 
         window.changeVideoPage = function(dir) {
@@ -642,13 +767,14 @@
             if(resetPage) videoPage = 1;
             const container = document.getElementById('admin-video-container');
             const paginationUI = document.getElementById('video-pagination');
+            if(!container) return;
             
             const sortedVideos = [...state.videos].sort((a,b) => new Date(b.tanggal || 0) - new Date(a.tanggal || 0));
             const totalItems = sortedVideos.length;
 
             if(totalItems === 0) { 
                 container.innerHTML = `<div class="p-6 text-center bg-white border border-slate-200 rounded-xl text-gray-400 text-sm">Video masih kosong.</div>`; 
-                paginationUI.classList.add('hidden'); paginationUI.classList.remove('flex');
+                if(paginationUI) { paginationUI.classList.add('hidden'); paginationUI.classList.remove('flex'); }
                 return; 
             }
 
@@ -659,7 +785,6 @@
 
             container.innerHTML = pagedVideos.map(v => {
                 let thumbUrl = v.thumbnail; 
-                // Ekstraksi Thumbnail YouTube Khusus Admin
                 if (!thumbUrl && v.url) { 
                     const ytMatch = v.url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/); 
                     if (ytMatch && ytMatch[2].length === 11) thumbUrl = `https://img.youtube.com/vi/${ytMatch[2]}/hqdefault.jpg`; 
@@ -669,29 +794,68 @@
                 return `<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col"><div class="absolute top-2 right-2 flex gap-1 z-10"><button onclick="editVideo('${v.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-edit text-sm"></i></button><button onclick="deleteVideo('${v.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-trash text-sm"></i></button></div><div class="h-32 w-full bg-slate-200 relative"><img src="${finalThumb}" class="w-full h-full object-cover"><div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded">${v.durasi || '00:00'}</div></div><div class="p-3"><span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-1 inline-block ${v.kategori === 'Tahfidz' ? 'bg-emerald-500' : v.kategori === 'Tahsin' ? 'bg-blue-500' : 'bg-slate-800'}">${v.kategori || 'Kajian'}</span><h4 class="font-bold text-sm text-slate-800 leading-snug line-clamp-2">${v.title}</h4><p class="text-[10px] text-slate-500 mt-1"><i class="far fa-calendar-alt"></i> ${v.tanggal || '-'}</p><a href="${v.url}" target="_blank" class="text-[10px] text-primary font-medium mt-2 block truncate"><i class="fas fa-link"></i> ${v.url}</a></div></div>`;
             }).join('');
 
-            paginationUI.classList.remove('hidden'); paginationUI.classList.add('flex');
-            document.getElementById('video-page-info').innerText = `${videoPage} / ${totalPages}`;
-            document.getElementById('btn-prev-video').disabled = videoPage === 1;
-            document.getElementById('btn-next-video').disabled = videoPage === totalPages;
+            if(paginationUI) {
+                paginationUI.classList.remove('hidden'); paginationUI.classList.add('flex');
+                if(document.getElementById('video-page-info')) document.getElementById('video-page-info').innerText = `${videoPage} / ${totalPages}`;
+                if(document.getElementById('btn-prev-video')) document.getElementById('btn-prev-video').disabled = videoPage === 1;
+                if(document.getElementById('btn-next-video')) document.getElementById('btn-next-video').disabled = videoPage === totalPages;
+            }
         };
 
         let editVideoId = null;
         window.editVideo = function(id) {
             const video = state.videos.find(v => v.id === id); if (!video) return;
-            document.getElementById('v-judul').value = video.title || ''; document.getElementById('v-kategori').value = video.kategori || 'Tahfidz'; document.getElementById('v-tanggal').value = video.tanggal || ''; document.getElementById('v-durasi').value = video.durasi || ''; document.getElementById('v-url').value = video.url || ''; document.getElementById('v-thumbnail').value = video.thumbnail || '';
-            editVideoId = id; const btn = document.getElementById('btn-submit-video'); btn.innerText = "Simpan Perubahan"; btn.classList.replace('bg-slate-900', 'bg-blue-600'); btn.classList.replace('hover:bg-slate-800', 'hover:bg-blue-700'); document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
+            
+            if(document.getElementById('v-judul')) document.getElementById('v-judul').value = video.title || ''; 
+            if(document.getElementById('v-kategori')) document.getElementById('v-kategori').value = video.kategori || 'Tahfidz'; 
+            if(document.getElementById('v-tanggal')) document.getElementById('v-tanggal').value = video.tanggal || ''; 
+            if(document.getElementById('v-durasi')) document.getElementById('v-durasi').value = video.durasi || ''; 
+            if(document.getElementById('v-url')) document.getElementById('v-url').value = video.url || ''; 
+            if(document.getElementById('v-thumbnail')) document.getElementById('v-thumbnail').value = video.thumbnail || '';
+            
+            editVideoId = id; 
+            const btn = document.getElementById('btn-submit-video'); 
+            if(btn) {
+                btn.innerText = "Simpan Perubahan"; 
+                btn.classList.replace('bg-slate-900', 'bg-blue-600'); 
+                btn.classList.replace('hover:bg-slate-800', 'hover:bg-blue-700'); 
+            }
+            const mainEl = document.querySelector('main');
+            if(mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
         window.addVideo = async function() {
             if (!currentUser) return;
-            const title = document.getElementById('v-judul').value; const kategori = document.getElementById('v-kategori').value; const tanggal = document.getElementById('v-tanggal').value; const durasi = document.getElementById('v-durasi').value; const url = document.getElementById('v-url').value; const thumbnail = document.getElementById('v-thumbnail').value;
+            const titleEl = document.getElementById('v-judul'); const kategoriEl = document.getElementById('v-kategori'); 
+            const tanggalEl = document.getElementById('v-tanggal'); const durasiEl = document.getElementById('v-durasi'); 
+            const urlEl = document.getElementById('v-url'); const thumbnailEl = document.getElementById('v-thumbnail');
+
+            const title = titleEl ? titleEl.value : ''; const kategori = kategoriEl ? kategoriEl.value : 'Tahfidz'; 
+            const tanggal = tanggalEl ? tanggalEl.value : ''; const durasi = durasiEl ? durasiEl.value : ''; 
+            const url = urlEl ? urlEl.value : ''; const thumbnail = thumbnailEl ? thumbnailEl.value : '';
+
             if(!title || !url || !tanggal) return window.showToast("Harap isi judul, tanggal, dan URL!", "error");
             try {
                 const videoData = { title, kategori, tanggal, durasi, url, thumbnail };
-                if (editVideoId) { await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'videos', editVideoId), videoData, { merge: true }); window.showToast("Video diupdate"); } 
-                else { const id = Date.now().toString(); await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'videos', id), videoData); window.showToast("Video ditambahkan"); }
-                document.getElementById('v-judul').value = ''; document.getElementById('v-kategori').value = 'Tahfidz'; document.getElementById('v-tanggal').value = ''; document.getElementById('v-durasi').value = ''; document.getElementById('v-url').value = ''; document.getElementById('v-thumbnail').value = '';
-                editVideoId = null; const btn = document.getElementById('btn-submit-video'); btn.innerText = "Tambah Video"; btn.classList.replace('bg-blue-600', 'bg-slate-900'); btn.classList.replace('hover:bg-blue-700', 'hover:bg-slate-800');
+                if (editVideoId) { 
+                    await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'videos', editVideoId), videoData, { merge: true }); 
+                    window.showToast("Video diupdate"); 
+                } else { 
+                    const id = Date.now().toString(); 
+                    await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'videos', id), videoData); 
+                    window.showToast("Video ditambahkan"); 
+                }
+                
+                if(titleEl) titleEl.value = ''; if(kategoriEl) kategoriEl.value = 'Tahfidz'; if(tanggalEl) tanggalEl.value = ''; 
+                if(durasiEl) durasiEl.value = ''; if(urlEl) urlEl.value = ''; if(thumbnailEl) thumbnailEl.value = '';
+                
+                editVideoId = null; 
+                const btn = document.getElementById('btn-submit-video'); 
+                if(btn) {
+                    btn.innerText = "Tambah Video"; 
+                    btn.classList.replace('bg-blue-600', 'bg-slate-900'); 
+                    btn.classList.replace('hover:bg-blue-700', 'hover:bg-slate-800');
+                }
             } catch (e) { window.showToast("Gagal menyimpan video", "error"); }
         };
 
@@ -699,16 +863,51 @@
 
         window.showToast = function(msg, type="success") {
             const toast = document.getElementById('toast'); const toastIconBg = document.getElementById('toast-icon-bg'); const toastIcon = document.getElementById('toast-icon');
-            document.getElementById('toast-message').innerText = msg;
-            if(type === "error") { toastIconBg.className = 'w-8 h-8 rounded-full bg-rose-500 flex items-center justify-center shrink-0'; toastIcon.className = 'fas fa-exclamation text-white text-sm'; } 
-            else { toastIconBg.className = 'w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0'; toastIcon.className = 'fas fa-check text-white text-sm'; }
-            toast.classList.remove('-translate-y-[200%]', 'opacity-0'); setTimeout(() => toast.classList.add('-translate-y-[200%]', 'opacity-0'), 3000);
+            if(!toast || !toastIconBg || !toastIcon) return;
+            const toastMsg = document.getElementById('toast-message');
+            if(toastMsg) toastMsg.innerText = msg;
+
+            if(type === "error") { 
+                toastIconBg.className = 'w-8 h-8 rounded-full bg-rose-500 flex items-center justify-center shrink-0'; 
+                toastIcon.className = 'fas fa-exclamation text-white text-sm'; 
+            } else { 
+                toastIconBg.className = 'w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0'; 
+                toastIcon.className = 'fas fa-check text-white text-sm'; 
+            }
+            toast.classList.remove('-translate-y-[200%]', 'opacity-0'); 
+            setTimeout(() => toast.classList.add('-translate-y-[200%]', 'opacity-0'), 3000);
         };
         
         let deferredPrompt; const installCard = document.getElementById('pwa-install-card'); const btnInstallPwa = document.getElementById('btn-install-pwa');
-        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; if(installCard) { installCard.classList.remove('hidden'); installCard.classList.add('flex'); } });
-        if(btnInstallPwa) { btnInstallPwa.addEventListener('click', async () => { if (deferredPrompt) { deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice; if(outcome === 'accepted') { installCard.classList.add('hidden'); } deferredPrompt = null; } }); }
-        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) { window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').then(reg => { reg.addEventListener('updatefound', () => { const newWorker = reg.installing; newWorker.addEventListener('statechange', () => { if (newWorker.state === 'installed' && navigator.serviceWorker.controller) { window.showToast("Pembaruan aplikasi tersedia! Memuat ulang...", "success"); setTimeout(() => window.location.reload(), 2000); } }); }); }).catch(err => console.warn('Pendaftaran ServiceWorker dilewati:', err)); }); }
+        window.addEventListener('beforeinstallprompt', (e) => { 
+            e.preventDefault(); deferredPrompt = e; 
+            if(installCard) { installCard.classList.remove('hidden'); installCard.classList.add('flex'); } 
+        });
+        if(btnInstallPwa) { 
+            btnInstallPwa.addEventListener('click', async () => { 
+                if (deferredPrompt) { 
+                    deferredPrompt.prompt(); 
+                    const { outcome } = await deferredPrompt.userChoice; 
+                    if(outcome === 'accepted' && installCard) { installCard.classList.add('hidden'); } 
+                    deferredPrompt = null; 
+                } 
+            }); 
+        }
+        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) { 
+            window.addEventListener('load', () => { 
+                navigator.serviceWorker.register('./sw.js').then(reg => { 
+                    reg.addEventListener('updatefound', () => { 
+                        const newWorker = reg.installing; 
+                        newWorker.addEventListener('statechange', () => { 
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) { 
+                                window.showToast("Pembaruan aplikasi tersedia! Memuat ulang...", "success"); 
+                                setTimeout(() => window.location.reload(), 2000); 
+                            } 
+                        }); 
+                    }); 
+                }).catch(err => console.warn('Pendaftaran ServiceWorker dilewati:', err)); 
+            }); 
+        }
     </script>
 </body>
 </html>
