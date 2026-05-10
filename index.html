@@ -192,7 +192,7 @@
                         <div class="space-y-3">
                             <div><label class="block text-xs font-medium mb-1 text-slate-500">Judul Agenda</label><input type="text" id="j-judul" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Cth: Bimbingan Tajwid"></div>
                             <div class="grid grid-cols-2 gap-3">
-                                <div><label class="block text-xs font-medium mb-1 text-slate-500">Tipe</label><select id="j-tipe" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary"><option value="Bimbingan">Bimbingan</option><option value="Kajian">Kajian</option></select></div>
+                                <div><label class="block text-xs font-medium mb-1 text-slate-500">Tipe</label><select id="j-tipe" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary"><option value="Bimbingan Hafalan">Bimbingan Hafalan</option><option value="Mengaji">Mengaji</option><option value="Kajian">Kajian</option><option value="Event">Event</option></select></div>
                                 <div><label class="block text-xs font-medium mb-1 text-slate-500">Tanggal</label><input type="date" id="j-tanggal" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary"></div>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
@@ -685,14 +685,20 @@
             const container = document.getElementById('admin-jadwal-container');
             if(!container) return;
             if(state.schedules.length === 0) { container.innerHTML = `<div class="p-6 text-center bg-white border border-slate-200 rounded-xl text-gray-400 text-sm">Jadwal masih kosong.</div>`; return; }
-            container.innerHTML = state.schedules.map(j => `<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col"><div class="absolute top-2 right-2 flex gap-1 z-10"><button onclick="editJadwal('${j.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-edit text-sm"></i></button><button onclick="deleteJadwal('${j.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-trash text-sm"></i></button></div><div class="h-32 w-full bg-slate-200 relative"><img src="${j.pamflet || 'https://brdsg.com/img/400/bq6rjfudbq7gvxva2d_1/LRa1FGRf9e5xfLcLRalHIayeLQhE5rRDMJEs7Knab8Q.webp'}" class="w-full h-full object-cover"></div><div class="p-4"><span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-2 inline-block ${j.type === 'Kajian' ? 'bg-primary' : 'bg-emerald-500'}">${j.type}</span><h4 class="font-bold text-base mb-1 pr-8 text-slate-800 leading-tight">${j.title}</h4><p class="text-xs text-slate-500"><i class="far fa-calendar-alt w-4"></i> ${j.date}</p><p class="text-xs text-slate-500"><i class="far fa-clock w-4"></i> ${j.time} ${j.timeEnd ? '- ' + j.timeEnd : ''} WIB</p><a href="${j.link}" target="_blank" class="text-xs text-primary font-medium mt-2 block truncate"><i class="fas fa-link w-4"></i> ${j.link}</a></div></div>`).join('');
+            container.innerHTML = state.schedules.map(j => {
+                let badgeColor = 'bg-emerald-500';
+                if(j.type === 'Kajian') badgeColor = 'bg-primary';
+                if(j.type === 'Mengaji') badgeColor = 'bg-indigo-500';
+                if(j.type === 'Event') badgeColor = 'bg-rose-500';
+                return `<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col"><div class="absolute top-2 right-2 flex gap-1 z-10"><button onclick="editJadwal('${j.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-edit text-sm"></i></button><button onclick="deleteJadwal('${j.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-trash text-sm"></i></button></div><div class="h-32 w-full bg-slate-200 relative"><img src="${j.pamflet || 'https://brdsg.com/img/400/bq6rjfudbq7gvxva2d_1/LRa1FGRf9e5xfLcLRalHIayeLQhE5rRDMJEs7Knab8Q.webp'}" class="w-full h-full object-cover"></div><div class="p-4"><span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-2 inline-block ${badgeColor}">${j.type}</span><h4 class="font-bold text-base mb-1 pr-8 text-slate-800 leading-tight">${j.title}</h4><p class="text-xs text-slate-500"><i class="far fa-calendar-alt w-4"></i> ${j.date}</p><p class="text-xs text-slate-500"><i class="far fa-clock w-4"></i> ${j.time} ${j.timeEnd ? '- ' + j.timeEnd : ''} WIB</p><a href="${j.link}" target="_blank" class="text-xs text-primary font-medium mt-2 block truncate"><i class="fas fa-link w-4"></i> ${j.link}</a></div></div>`;
+            }).join('');
         }
 
         let editJadwalId = null;
         window.editJadwal = function(id) {
             const sched = state.schedules.find(s => s.id === id); if (!sched) return;
             if(document.getElementById('j-judul')) document.getElementById('j-judul').value = sched.title || ''; 
-            if(document.getElementById('j-tipe')) document.getElementById('j-tipe').value = sched.type || 'Bimbingan'; 
+            if(document.getElementById('j-tipe')) document.getElementById('j-tipe').value = sched.type || 'Bimbingan Hafalan'; 
             if(document.getElementById('j-tanggal')) document.getElementById('j-tanggal').value = sched.date || ''; 
             if(document.getElementById('j-waktu')) document.getElementById('j-waktu').value = sched.time || ''; 
             if(document.getElementById('j-waktu-selesai')) document.getElementById('j-waktu-selesai').value = sched.timeEnd || ''; 
@@ -717,7 +723,7 @@
             const timeEndEl = document.getElementById('j-waktu-selesai'); const linkEl = document.getElementById('j-link'); 
             const pamfletEl = document.getElementById('j-pamflet');
 
-            const title = titleEl ? titleEl.value : ''; const type = typeEl ? typeEl.value : 'Bimbingan'; 
+            const title = titleEl ? titleEl.value : ''; const type = typeEl ? typeEl.value : 'Bimbingan Hafalan'; 
             const date = dateEl ? dateEl.value : ''; const time = timeEl ? timeEl.value : ''; 
             const timeEnd = timeEndEl ? timeEndEl.value : ''; const link = linkEl ? linkEl.value : ''; 
             const pamflet = pamfletEl ? pamfletEl.value : '';
