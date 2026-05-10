@@ -87,7 +87,7 @@
                                 <input type="text" id="filter-search" placeholder="Cari nama, email, surah..." class="w-full border border-slate-200 px-3 py-2 rounded-lg text-xs outline-none focus:ring-1 focus:ring-primary bg-slate-50">
                                 <select id="filter-status" class="border border-slate-200 px-2 py-2 rounded-lg text-xs outline-none focus:ring-1 focus:ring-primary bg-slate-50 text-slate-600">
                                     <option value="Semua">Semua Status</option>
-                                    <option value="Menunggu Review">Menunggu</option>
+                                    <option value="Menunggu Review" selected>Menunggu</option>
                                     <option value="Diterima">Diterima</option>
                                     <option value="Perlu Perbaikan">Revisi</option>
                                 </select>
@@ -103,7 +103,7 @@
                                 <div><input type="time" id="filter-end-time" class="w-full border border-slate-200 px-2 py-1.5 rounded text-xs outline-none focus:ring-1 focus:ring-primary"></div>
                             </div>
 
-                            <button onclick="renderSetoran()" class="w-full bg-primary hover:bg-sky-600 text-white font-bold py-2 rounded-lg transition text-xs shadow-sm">
+                            <button onclick="renderSetoran(true)" class="w-full bg-primary hover:bg-sky-600 text-white font-bold py-2 rounded-lg transition text-xs shadow-sm">
                                 <i class="fas fa-search mr-1"></i> Terapkan Filter
                             </button>
 
@@ -115,8 +115,26 @@
                         </div>
                     </div>
 
-                    <!-- Daftar Setoran (Mengikuti Filter) -->
+                    <!-- Daftar Setoran (Mengikuti Filter & Pagination) -->
                     <div id="admin-setoran-container" class="space-y-4"></div>
+
+                    <!-- Pagination Setoran -->
+                    <div id="review-pagination" class="hidden justify-between items-center mt-4 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-slate-500 font-bold">Baris:</span>
+                            <select id="review-limit" onchange="changeReviewLimit()" class="text-xs border border-slate-200 rounded p-1 outline-none text-slate-600 font-medium">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="changeReviewPage(-1)" id="btn-prev-review" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 disabled:opacity-30 flex items-center justify-center transition"><i class="fas fa-chevron-left text-xs"></i></button>
+                            <span class="text-xs font-bold text-slate-700" id="review-page-info">1 / 1</span>
+                            <button onclick="changeReviewPage(1)" id="btn-next-review" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 disabled:opacity-30 flex items-center justify-center transition"><i class="fas fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- Tab: Data Peserta -->
@@ -134,6 +152,10 @@
                             <input type="email" id="p-email" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary" placeholder="Email Peserta">
                             <div id="p-password-container">
                                 <input type="text" id="p-password" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary" placeholder="Buat Sandi (min. 6 karakter)">
+                            </div>
+                            <div id="p-existing-auth-container" class="flex items-start gap-2 mt-1">
+                                <input type="checkbox" id="p-existing-auth" onchange="togglePasswordVisibility()" class="mt-1 w-4 h-4 text-primary rounded border-slate-300 focus:ring-primary">
+                                <label for="p-existing-auth" class="text-xs text-slate-600 font-medium leading-snug">Centang ini jika email sudah terdaftar di Firebase (Hanya tambahkan profilnya saja ke daftar)</label>
                             </div>
                             <input type="number" id="p-wa" class="w-full border border-slate-200 px-3 py-2 rounded-lg text-sm outline-none focus:ring-1 focus:ring-primary" placeholder="No WhatsApp Aktif">
                         </div>
@@ -195,7 +217,26 @@
                         </div>
                         <button id="btn-submit-video" onclick="addVideo()" class="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg transition text-xs shadow-sm">Tambah Video</button>
                     </div>
+
                     <div id="admin-video-container" class="space-y-4"></div>
+
+                    <!-- Pagination Video -->
+                    <div id="video-pagination" class="hidden justify-between items-center mt-4 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] text-slate-500 font-bold">Baris:</span>
+                            <select id="video-limit" onchange="changeVideoLimit()" class="text-xs border border-slate-200 rounded p-1 outline-none text-slate-600 font-medium">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="changeVideoPage(-1)" id="btn-prev-video" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 disabled:opacity-30 flex items-center justify-center transition"><i class="fas fa-chevron-left text-xs"></i></button>
+                            <span class="text-xs font-bold text-slate-700" id="video-page-info">1 / 1</span>
+                            <button onclick="changeVideoPage(1)" id="btn-next-video" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 disabled:opacity-30 flex items-center justify-center transition"><i class="fas fa-chevron-right text-xs"></i></button>
+                        </div>
+                    </div>
                 </section>
 
                 <!-- Tab: Pengaturan -->
@@ -249,14 +290,20 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Instance kedua untuk membuat akun pendaftar tanpa melogout sesi Admin yang sedang aktif
+        // Instance kedua untuk membuat akun pendaftar
         const appSecondary = initializeApp(firebaseConfig, "SecondaryApp");
         const authSecondary = getAuth(appSecondary);
 
         let currentUser = null;
         let state = { setoran: [], schedules: [], videos: [], peserta: [] };
 
-        // --- Daftar Surah untuk Perhitungan Progres Hafalan ---
+        // Variabel Pagination Global
+        let reviewPage = 1;
+        let reviewLimit = 10;
+        let videoPage = 1;
+        let videoLimit = 10;
+
+        // --- Daftar Surah ---
         const daftarSurah = [{nama:"Al-Fatihah",ayat:7},{nama:"Al-Baqarah",ayat:286},{nama:"Ali 'Imran",ayat:200},{nama:"An-Nisa'",ayat:176},{nama:"Al-Ma'idah",ayat:120},{nama:"Al-An'am",ayat:165},{nama:"Al-A'raf",ayat:206},{nama:"Al-Anfal",ayat:75},{nama:"At-Taubah",ayat:129},{nama:"Yunus",ayat:109},{nama:"Hud",ayat:123},{nama:"Yusuf",ayat:111},{nama:"Ar-Ra'd",ayat:43},{nama:"Ibrahim",ayat:52},{nama:"Al-Hijr",ayat:99},{nama:"An-Nahl",ayat:128},{nama:"Al-Isra'",ayat:111},{nama:"Al-Kahf",ayat:110},{nama:"Maryam",ayat:98},{nama:"Taha",ayat:135},{nama:"Al-Anbiya'",ayat:112},{nama:"Al-Hajj",ayat:78},{nama:"Al-Mu'minun",ayat:118},{nama:"An-Nur",ayat:64},{nama:"Al-Furqan",ayat:77},{nama:"Asy-Syu'ara'",ayat:227},{nama:"An-Naml",ayat:93},{nama:"Al-Qasas",ayat:88},{nama:"Al-'Ankabut",ayat:69},{nama:"Ar-Rum",ayat:60},{nama:"Luqman",ayat:34},{nama:"As-Sajdah",ayat:30},{nama:"Al-Ahzab",ayat:73},{nama:"Saba'",ayat:54},{nama:"Fatir",ayat:45},{nama:"Yasin",ayat:83},{nama:"As-Saffat",ayat:182},{nama:"Sad",ayat:88},{nama:"Az-Zumar",ayat:75},{nama:"Gafir",ayat:85},{nama:"Fussilat",ayat:54},{nama:"Asy-Syura",ayat:53},{nama:"Az-Zukhruf",ayat:89},{nama:"Ad-Dukhan",ayat:59},{nama:"Al-Jasiyah",ayat:37},{nama:"Al-Ahqaf",ayat:35},{nama:"Muhammad",ayat:38},{nama:"Al-Fath",ayat:29},{nama:"Al-Hujurat",ayat:18},{nama:"Qaf",ayat:45},{nama:"Az-Zariyat",ayat:60},{nama:"At-Tur",ayat:49},{nama:"An-Najm",ayat:62},{nama:"Al-Qamar",ayat:55},{nama:"Ar-Rahman",ayat:78},{nama:"Al-Waqi'ah",ayat:96},{nama:"Al-Hadid",ayat:29},{nama:"Al-Mujadilah",ayat:22},{nama:"Al-Hasyr",ayat:24},{nama:"Al-Mumtahanah",ayat:13},{nama:"As-Saff",ayat:14},{nama:"Al-Jumu'ah",ayat:11},{nama:"Al-Munafiqun",ayat:11},{nama:"At-Tagabun",ayat:18},{nama:"At-Talaq",ayat:12},{nama:"At-Tahrim",ayat:12},{nama:"Al-Mulk",ayat:30},{nama:"Al-Qalam",ayat:52},{nama:"Al-Haqqah",ayat:52},{nama:"Al-Ma'arij",ayat:44},{nama:"Nuh",ayat:28},{nama:"Al-Jinn",ayat:28},{nama:"Al-Muzzammil",ayat:20},{nama:"Al-Muddassir",ayat:56},{nama:"Al-Qiyamah",ayat:40},{nama:"Al-Insan",ayat:31},{nama:"Al-Mursalat",ayat:50},{nama:"An-Naba'",ayat:40},{nama:"An-Nazi'at",ayat:46},{nama:"'Abasa",ayat:42},{nama:"At-Takwir",ayat:29},{nama:"Al-Infitar",ayat:19},{nama:"Al-Mutaffifin",ayat:36},{nama:"Al-Insyiqaq",ayat:25},{nama:"Al-Buruj",ayat:22},{nama:"At-Tariq",ayat:17},{nama:"Al-A'la",ayat:19},{nama:"Al-Gasyiyah",ayat:26},{nama:"Al-Fajr",ayat:30},{nama:"Al-Balad",ayat:20},{nama:"Asy-Syams",ayat:15},{nama:"Al-Lail",ayat:21},{nama:"Ad-Duha",ayat:11},{nama:"Asy-Syarh",ayat:8},{nama:"At-Tin",ayat:8},{nama:"Al-'Alaq",ayat:19},{nama:"Al-Qadr",ayat:5},{nama:"Al-Bayyinah",ayat:8},{nama:"Az-Zalzalah",ayat:8},{nama:"Al-'Adiyat",ayat:11},{nama:"Al-Qari'ah",ayat:11},{nama:"At-Takasur",ayat:8},{nama:"Al-'Asr",ayat:3},{nama:"Al-Humazah",ayat:9},{nama:"Al-Fil",ayat:5},{nama:"Quraisy",ayat:4},{nama:"Al-Ma'un",ayat:7},{nama:"Al-Kausar",ayat:3},{nama:"Al-Kafirun",ayat:6},{nama:"An-Nasr",ayat:3},{nama:"Al-Lahab",ayat:5},{nama:"Al-Ikhlas",ayat:4},{nama:"Al-Falaq",ayat:5},{nama:"An-Nas",ayat:6}];
 
         onAuthStateChanged(auth, async (user) => {
@@ -352,27 +399,36 @@
         // --- Fitur Kelola Peserta ---
         let editPesertaId = null;
 
+        window.togglePasswordVisibility = function() {
+            if(document.getElementById('p-existing-auth').checked) {
+                document.getElementById('p-password-container').classList.add('hidden');
+            } else {
+                document.getElementById('p-password-container').classList.remove('hidden');
+            }
+        };
+
         window.savePeserta = async function() {
             const sapaan = document.getElementById('p-sapaan').value; const nama = document.getElementById('p-nama').value;
             const email = document.getElementById('p-email').value; const password = document.getElementById('p-password').value;
             const wa = document.getElementById('p-wa').value;
+            const isExisting = document.getElementById('p-existing-auth').checked;
 
             if(!nama || !email || !wa) return showToast("Harap isi nama, email, dan WA!", "error");
 
             try {
                 if (editPesertaId) {
-                    // Update profil
                     await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'peserta', editPesertaId), { sapaan, nama, email, wa }, {merge: true});
                     showToast("Profil peserta diperbarui");
                 } else {
-                    // Tambah baru (buat akun auth sekunder lalu simpan profil)
-                    if(password.length < 6) return showToast("Password minimal 6 karakter!", "error");
-                    showToast("Sedang membuat akun...");
-                    await createUserWithEmailAndPassword(authSecondary, email, password);
-                    await signOut(authSecondary);
+                    if (!isExisting) {
+                        if(password.length < 6) return showToast("Password minimal 6 karakter!", "error");
+                        showToast("Sedang membuat akun...");
+                        await createUserWithEmailAndPassword(authSecondary, email, password);
+                        await signOut(authSecondary);
+                    }
                     const id = Date.now().toString();
                     await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'peserta', id), { sapaan, nama, email, wa, tgl_daftar: new Date().toLocaleDateString('id-ID') });
-                    showToast("Akun peserta berhasil dibuat!");
+                    showToast(isExisting ? "Profil berhasil dipulihkan!" : "Akun peserta berhasil dibuat!");
                 }
                 resetPesertaForm();
             } catch (e) { console.error(e); showToast("Gagal! Email mungkin sudah digunakan/tidak valid.", "error"); }
@@ -385,8 +441,8 @@
             document.getElementById('p-email').value = p.email || '';
             document.getElementById('p-wa').value = p.wa || '';
             
-            // Sembunyikan field password saat edit
             document.getElementById('p-password-container').classList.add('hidden');
+            document.getElementById('p-existing-auth-container').classList.add('hidden');
             
             editPesertaId = id;
             document.getElementById('btn-submit-peserta').innerText = "Update Profil Peserta";
@@ -400,7 +456,10 @@
         window.resetPesertaForm = function() {
             document.getElementById('p-nama').value = ''; document.getElementById('p-email').value = ''; 
             document.getElementById('p-password').value = ''; document.getElementById('p-wa').value = '';
+            document.getElementById('p-existing-auth').checked = false;
             document.getElementById('p-password-container').classList.remove('hidden');
+            document.getElementById('p-existing-auth-container').classList.remove('hidden');
+            
             editPesertaId = null;
             document.getElementById('btn-submit-peserta').innerText = "Buat Akun & Simpan Profil";
             document.getElementById('btn-submit-peserta').classList.replace('bg-blue-600', 'bg-slate-900');
@@ -410,7 +469,7 @@
         };
 
         window.deletePeserta = async function(id) {
-            if(confirm("Hapus profil peserta ini? (Catatan: Auth login dan data setoran tidak terhapus, hanya data profil ini yang dihapus)")) {
+            if(confirm("Hapus profil peserta ini? (Catatan: Auth login dan data setoran tidak terhapus)")) {
                 try { await deleteDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'peserta', id)); showToast("Profil dihapus"); } catch (e) { showToast("Gagal", "error"); }
             }
         };
@@ -454,11 +513,24 @@
             }).join('');
         };
 
-        // --- Fitur Review Setoran ---
-        window.loadSetoran = function() { renderSetoran(); };
+        // --- Fitur Review Setoran & Pagination ---
+        window.loadSetoran = function() { renderSetoran(true); };
 
-        window.renderSetoran = function() {
+        window.changeReviewLimit = function() {
+            reviewLimit = parseInt(document.getElementById('review-limit').value);
+            renderSetoran(true); // reset page ke 1
+        };
+
+        window.changeReviewPage = function(dir) {
+            reviewPage += dir;
+            renderSetoran(false);
+        };
+
+        window.renderSetoran = function(resetPage = false) {
+            if(resetPage) reviewPage = 1;
             const container = document.getElementById('admin-setoran-container');
+            const paginationUI = document.getElementById('review-pagination');
+            
             const search = document.getElementById('filter-search') ? document.getElementById('filter-search').value.toLowerCase() : '';
             const status = document.getElementById('filter-status') ? document.getElementById('filter-status').value : 'Semua';
             const startDate = document.getElementById('filter-start-date') ? document.getElementById('filter-start-date').value : '';
@@ -466,16 +538,9 @@
             const endDate = document.getElementById('filter-end-date') ? document.getElementById('filter-end-date').value : '';
             const endTime = document.getElementById('filter-end-time') ? document.getElementById('filter-end-time').value : '';
 
-            // Hitung rentang waktu berdasarkan document ID (yang merupakan Date.now)
             let startMs = 0; let endMs = Infinity;
-            if(startDate) {
-                const sTime = startTime || "00:00";
-                startMs = new Date(`${startDate}T${sTime}:00`).getTime();
-            }
-            if(endDate) {
-                const eTime = endTime || "23:59";
-                endMs = new Date(`${endDate}T${eTime}:59`).getTime();
-            }
+            if(startDate) { const sTime = startTime || "00:00"; startMs = new Date(`${startDate}T${sTime}:00`).getTime(); }
+            if(endDate) { const eTime = endTime || "23:59"; endMs = new Date(`${endDate}T${eTime}:59`).getTime(); }
 
             const filteredSetoran = state.setoran.filter(s => {
                 const ms = parseInt(s.id);
@@ -485,11 +550,21 @@
                 return matchTime && matchSearch && matchStatus;
             }).sort((a,b) => Number(b.id) - Number(a.id));
 
-            document.getElementById('rekap-count').innerText = filteredSetoran.length;
+            const totalItems = filteredSetoran.length;
+            document.getElementById('rekap-count').innerText = totalItems;
 
-            if(filteredSetoran.length === 0) { container.innerHTML = `<div class="p-8 text-center bg-white rounded-xl shadow-sm border border-slate-200 text-slate-400 text-sm">Data setoran tidak ditemukan.</div>`; return; }
+            if(totalItems === 0) { 
+                container.innerHTML = `<div class="p-8 text-center bg-white rounded-xl shadow-sm border border-slate-200 text-slate-400 text-sm">Data setoran tidak ditemukan.</div>`; 
+                paginationUI.classList.add('hidden'); paginationUI.classList.remove('flex');
+                return; 
+            }
+
+            const totalPages = Math.ceil(totalItems / reviewLimit);
+            if(reviewPage > totalPages) reviewPage = totalPages;
+            const startIndex = (reviewPage - 1) * reviewLimit;
+            const pagedSetoran = filteredSetoran.slice(startIndex, startIndex + reviewLimit);
             
-            container.innerHTML = filteredSetoran.map(s => {
+            container.innerHTML = pagedSetoran.map(s => {
                 const catatanHtml = s.status === 'Menunggu Review' 
                     ? `<textarea id="catatan-${s.id}" placeholder="Tambahkan catatan/koreksi (opsional)..." class="w-full text-xs p-2.5 border border-slate-200 rounded-lg mt-3 mb-1 outline-none focus:ring-1 focus:ring-primary bg-slate-50 hide-scrollbar" rows="2"></textarea>`
                     : (s.catatan ? `<div class="bg-slate-50 p-2.5 rounded-lg mt-3 text-xs text-slate-600 border border-slate-100"><span class="font-bold text-slate-700">Catatan Admin:</span><br>${s.catatan}</div>` : '');
@@ -502,6 +577,12 @@
                 }
                 return `<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-3"><div class="flex justify-between items-start"><div><h3 class="font-bold text-sm text-slate-800 break-all">${s.user}</h3><p class="text-sm text-slate-600 font-medium">${s.surah}</p><p class="text-[10px] text-slate-400 mt-1"><i class="far fa-clock"></i> ${s.date}</p></div><span class="px-2 py-1 rounded text-[10px] font-bold text-white shadow-sm shrink-0 ${s.status === 'Menunggu Review' ? 'bg-yellow-500' : s.status === 'Diterima' ? 'bg-green-500' : 'bg-red-500'}">${s.status}</span></div><div class="w-full"><audio src="${s.audioBase64}" controls class="w-full h-10 mb-1"></audio>${catatanHtml}${btnHtml}</div></div>`;
             }).join('');
+
+            // Tampilkan dan update state Pagination UI
+            paginationUI.classList.remove('hidden'); paginationUI.classList.add('flex');
+            document.getElementById('review-page-info').innerText = `${reviewPage} / ${totalPages}`;
+            document.getElementById('btn-prev-review').disabled = reviewPage === 1;
+            document.getElementById('btn-next-review').disabled = reviewPage === totalPages;
         };
 
         window.updateSetoranStatus = async function(id, newStatus) {
@@ -546,12 +627,53 @@
 
         window.deleteJadwal = async function(id) { if (!currentUser) return; if(confirm("Hapus jadwal ini?")) { try { await deleteDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'schedules', id)); window.showToast("Jadwal dihapus"); } catch (e) {} } };
 
-        // --- Fitur Video ---
-        function renderVideo() {
+        // --- Fitur Video & Pagination ---
+        window.changeVideoLimit = function() {
+            videoLimit = parseInt(document.getElementById('video-limit').value);
+            renderVideo(true);
+        };
+
+        window.changeVideoPage = function(dir) {
+            videoPage += dir;
+            renderVideo(false);
+        };
+
+        window.renderVideo = function(resetPage = false) {
+            if(resetPage) videoPage = 1;
             const container = document.getElementById('admin-video-container');
-            if(state.videos.length === 0) { container.innerHTML = `<div class="p-6 text-center bg-white border border-slate-200 rounded-xl text-gray-400 text-sm">Video masih kosong.</div>`; return; }
-            container.innerHTML = state.videos.map(v => `<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col"><div class="absolute top-2 right-2 flex gap-1 z-10"><button onclick="editVideo('${v.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-edit text-sm"></i></button><button onclick="deleteVideo('${v.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-trash text-sm"></i></button></div><div class="h-32 w-full bg-slate-200 relative"><img src="${v.thumbnail || 'https://images.unsplash.com/photo-1609599006353-e629aaab31f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" class="w-full h-full object-cover"><div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded">${v.durasi || '00:00'}</div></div><div class="p-3"><span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-1 inline-block ${v.kategori === 'Tahfidz' ? 'bg-emerald-500' : v.kategori === 'Tahsin' ? 'bg-blue-500' : 'bg-slate-800'}">${v.kategori || 'Kajian'}</span><h4 class="font-bold text-sm text-slate-800 leading-snug line-clamp-2">${v.title}</h4><p class="text-[10px] text-slate-500 mt-1"><i class="far fa-calendar-alt"></i> ${v.tanggal || '-'}</p><a href="${v.url}" target="_blank" class="text-[10px] text-primary font-medium mt-2 block truncate"><i class="fas fa-link"></i> ${v.url}</a></div></div>`).join('');
-        }
+            const paginationUI = document.getElementById('video-pagination');
+            
+            const sortedVideos = [...state.videos].sort((a,b) => new Date(b.tanggal || 0) - new Date(a.tanggal || 0));
+            const totalItems = sortedVideos.length;
+
+            if(totalItems === 0) { 
+                container.innerHTML = `<div class="p-6 text-center bg-white border border-slate-200 rounded-xl text-gray-400 text-sm">Video masih kosong.</div>`; 
+                paginationUI.classList.add('hidden'); paginationUI.classList.remove('flex');
+                return; 
+            }
+
+            const totalPages = Math.ceil(totalItems / videoLimit);
+            if(videoPage > totalPages) videoPage = totalPages;
+            const startIndex = (videoPage - 1) * videoLimit;
+            const pagedVideos = sortedVideos.slice(startIndex, startIndex + videoLimit);
+
+            container.innerHTML = pagedVideos.map(v => {
+                let thumbUrl = v.thumbnail; 
+                // Ekstraksi Thumbnail YouTube Khusus Admin
+                if (!thumbUrl && v.url) { 
+                    const ytMatch = v.url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/); 
+                    if (ytMatch && ytMatch[2].length === 11) thumbUrl = `https://img.youtube.com/vi/${ytMatch[2]}/hqdefault.jpg`; 
+                }
+                const finalThumb = thumbUrl || 'https://images.unsplash.com/photo-1609599006353-e629aaab31f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                
+                return `<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col"><div class="absolute top-2 right-2 flex gap-1 z-10"><button onclick="editVideo('${v.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-edit text-sm"></i></button><button onclick="deleteVideo('${v.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-trash text-sm"></i></button></div><div class="h-32 w-full bg-slate-200 relative"><img src="${finalThumb}" class="w-full h-full object-cover"><div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded">${v.durasi || '00:00'}</div></div><div class="p-3"><span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-1 inline-block ${v.kategori === 'Tahfidz' ? 'bg-emerald-500' : v.kategori === 'Tahsin' ? 'bg-blue-500' : 'bg-slate-800'}">${v.kategori || 'Kajian'}</span><h4 class="font-bold text-sm text-slate-800 leading-snug line-clamp-2">${v.title}</h4><p class="text-[10px] text-slate-500 mt-1"><i class="far fa-calendar-alt"></i> ${v.tanggal || '-'}</p><a href="${v.url}" target="_blank" class="text-[10px] text-primary font-medium mt-2 block truncate"><i class="fas fa-link"></i> ${v.url}</a></div></div>`;
+            }).join('');
+
+            paginationUI.classList.remove('hidden'); paginationUI.classList.add('flex');
+            document.getElementById('video-page-info').innerText = `${videoPage} / ${totalPages}`;
+            document.getElementById('btn-prev-video').disabled = videoPage === 1;
+            document.getElementById('btn-next-video').disabled = videoPage === totalPages;
+        };
 
         let editVideoId = null;
         window.editVideo = function(id) {
