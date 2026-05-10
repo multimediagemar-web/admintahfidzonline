@@ -228,27 +228,7 @@
                         <button id="btn-submit-video" onclick="addVideo()" class="mt-4 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-lg transition text-xs shadow-sm">Tambah Video</button>
                     </div>
 
-                    <div id="admin-video-container" class="space-y-4">
-                        <div class="flex flex-col items-center justify-center py-8 gap-3"><i class="fas fa-spinner fa-spin text-3xl text-primary"></i><span class="text-xs text-slate-400 font-medium">Memuat data video...</span></div>
-                    </div>
-
-                    <!-- Pagination Video -->
-                    <div id="video-pagination" class="hidden justify-between items-center mt-4 bg-white p-3 rounded-xl shadow-sm border border-slate-200">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] text-slate-500 font-bold">Baris:</span>
-                            <select id="video-limit" onchange="changeVideoLimit()" class="text-xs border border-slate-200 rounded p-1 outline-none text-slate-600 font-medium">
-                                <option value="5">5</option>
-                                <option value="10" selected>10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                            </select>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <button onclick="changeVideoPage(-1)" id="btn-prev-video" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 disabled:opacity-30 flex items-center justify-center transition"><i class="fas fa-chevron-left text-xs"></i></button>
-                            <span class="text-xs font-bold text-slate-700" id="video-page-info">1 / 1</span>
-                            <button onclick="changeVideoPage(1)" id="btn-next-video" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-600 disabled:opacity-30 flex items-center justify-center transition"><i class="fas fa-chevron-right text-xs"></i></button>
-                        </div>
-                    </div>
+                    <div id="admin-video-container" class="space-y-4"></div>
                 </section>
 
                 <!-- Tab: Pengaturan -->
@@ -290,6 +270,19 @@
     <div id="toast" class="fixed top-12 left-1/2 transform -translate-x-1/2 w-[85%] max-w-[350px] bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl transition-all duration-400 -translate-y-[200%] opacity-0 z-[300] flex items-center gap-3">
         <div id="toast-icon-bg" class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center shrink-0"><i id="toast-icon" class="fas fa-check text-white text-sm"></i></div>
         <span id="toast-message" class="font-medium text-sm leading-tight flex-1">Notifikasi</span>
+    </div>
+
+    <!-- Video Modal / In-App Player -->
+    <div id="video-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md hidden z-[250] flex items-center justify-center p-4 opacity-0 transition-opacity">
+        <div class="w-full max-w-md relative transform scale-95 transition-all" id="video-modal-panel">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="font-bold text-white text-sm" id="video-modal-title">Memutar Video...</h3>
+                <button onclick="closeVideoModal()" class="w-8 h-8 bg-white/20 text-white rounded-full flex items-center justify-center hover:bg-white/40 transition backdrop-blur-sm"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="bg-black w-full rounded-2xl overflow-hidden shadow-2xl aspect-video relative">
+                <div id="video-modal-content" class="absolute inset-0 w-full h-full"></div>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -754,63 +747,73 @@
 
         window.deleteJadwal = async function(id) { if (!currentUser) return; if(confirm("Hapus jadwal ini?")) { try { await deleteDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'schedules', id)); window.showToast("Jadwal dihapus"); } catch (e) {} } };
 
-        // --- Fitur Video & Pagination ---
-        window.changeVideoLimit = function() {
-            const limitEl = document.getElementById('video-limit');
-            if(limitEl) {
-                videoLimit = parseInt(limitEl.value);
-                renderVideo(true);
-            }
-        };
-
-        window.changeVideoPage = function(dir) {
-            videoPage += dir;
-            renderVideo(false);
-        };
-
-        window.renderVideo = function(resetPage = false) {
-            if(resetPage) videoPage = 1;
-            const container = document.getElementById('admin-video-container');
-            const paginationUI = document.getElementById('video-pagination');
-            if(!container) return;
+        // --- Fitur Video ---
+        window.openVideoModal = function(url, title) {
+            const modal = document.getElementById('video-modal'); 
+            const panel = document.getElementById('video-modal-panel'); 
+            const content = document.getElementById('video-modal-content'); 
+            const titleEl = document.getElementById('video-modal-title');
             
-            const sortedVideos = [...state.videos].sort((a,b) => new Date(b.tanggal || 0) - new Date(a.tanggal || 0));
-            const totalItems = sortedVideos.length;
-
-            if(totalItems === 0) { 
-                container.innerHTML = `<div class="p-6 text-center bg-white border border-slate-200 rounded-xl text-gray-400 text-sm">Video masih kosong.</div>`; 
-                if(paginationUI) { paginationUI.classList.add('hidden'); paginationUI.classList.remove('flex'); }
-                return; 
+            if(titleEl) titleEl.innerText = title || "Kajian"; 
+            let embedUrl = url; 
+            const ytRegExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/; 
+            const ytMatch = url.match(ytRegExp);
+            
+            if (ytMatch && ytMatch[2].length === 11) {
+                embedUrl = `https://www.youtube.com/embed/${ytMatch[2]}?autoplay=1&rel=0`; 
+            } else if (url.includes('drive.google.com')) {
+                embedUrl = url.replace(/\/view.*$/, '/preview');
             }
+            
+            if(content) content.innerHTML = `<iframe class="w-full h-full" src="${embedUrl}" title="${title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            if(modal && panel) { modal.classList.remove('hidden'); setTimeout(() => { modal.classList.remove('opacity-0'); panel.classList.remove('scale-95'); }, 10); }
+        };
+        
+        window.closeVideoModal = function() { 
+            const modal = document.getElementById('video-modal'); 
+            const panel = document.getElementById('video-modal-panel'); 
+            const content = document.getElementById('video-modal-content'); 
+            if(modal && panel) { modal.classList.add('opacity-0'); panel.classList.add('scale-95'); setTimeout(() => { modal.classList.add('hidden'); if(content) content.innerHTML = ''; }, 300); }
+        };
 
-            const totalPages = Math.ceil(totalItems / videoLimit);
-            if(videoPage > totalPages) videoPage = totalPages;
-            const startIndex = (videoPage - 1) * videoLimit;
-            const pagedVideos = sortedVideos.slice(startIndex, startIndex + videoLimit);
-
-            container.innerHTML = pagedVideos.map(v => {
-                let thumbUrl = v.thumbnail; 
-                if (!thumbUrl && v.url) { 
+        function renderVideo() {
+            const container = document.getElementById('admin-video-container');
+            if(!container) return;
+            if(state.videos.length === 0) { container.innerHTML = `<div class="p-6 text-center bg-white border border-slate-200 rounded-xl text-gray-400 text-sm">Video masih kosong.</div>`; return; }
+            container.innerHTML = state.videos.map(v => {
+                let thumbUrl = ''; 
+                if (v.url) { 
                     const ytMatch = v.url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/); 
                     if (ytMatch && ytMatch[2].length === 11) thumbUrl = `https://img.youtube.com/vi/${ytMatch[2]}/hqdefault.jpg`; 
                 }
                 const finalThumb = thumbUrl || 'https://images.unsplash.com/photo-1609599006353-e629aaab31f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
                 
-                return `<div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col"><div class="absolute top-2 right-2 flex gap-1 z-10"><button onclick="editVideo('${v.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-edit text-sm"></i></button><button onclick="deleteVideo('${v.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-trash text-sm"></i></button></div><div class="h-32 w-full bg-slate-200 relative"><img src="${finalThumb}" class="w-full h-full object-cover"><div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded">${v.durasi || '00:00'}</div></div><div class="p-3"><span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-1 inline-block ${v.kategori === 'Tahfidz' ? 'bg-emerald-500' : v.kategori === 'Tahsin' ? 'bg-blue-500' : 'bg-slate-800'}">${v.kategori || 'Kajian'}</span><h4 class="font-bold text-sm text-slate-800 leading-snug line-clamp-2">${v.title}</h4><p class="text-[10px] text-slate-500 mt-1"><i class="far fa-calendar-alt"></i> ${v.tanggal || '-'}</p><a href="${v.url}" target="_blank" class="text-[10px] text-primary font-medium mt-2 block truncate"><i class="fas fa-link"></i> ${v.url}</a></div></div>`;
+                return `
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200 relative flex flex-col">
+                    <div class="absolute top-2 right-2 flex gap-1 z-20">
+                        <button onclick="editVideo('${v.id}')" class="bg-blue-50 text-blue-500 hover:text-blue-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-edit text-sm"></i></button>
+                        <button onclick="deleteVideo('${v.id}')" class="bg-red-50 text-red-500 hover:text-red-700 p-2 rounded-lg transition shadow-sm"><i class="fas fa-trash text-sm"></i></button>
+                    </div>
+                    <div class="h-44 w-full bg-slate-200 relative group cursor-pointer" onclick="openVideoModal('${v.url}', '${v.title.replace(/'/g, "\\'")}')">
+                        <img src="${finalThumb}" class="w-full h-full object-cover transition transform group-hover:scale-105 duration-700">
+                        <div class="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition"></div>
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                            <div class="w-10 h-10 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center text-white pl-1 border border-white/40 shadow-lg"><i class="fas fa-play"></i></div>
+                        </div>
+                        <div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] font-bold px-2 py-1 rounded">${v.durasi || '00:00'}</div>
+                    </div>
+                    <div class="p-4">
+                        <span class="text-[10px] font-bold text-white px-2 py-0.5 rounded shadow-sm mb-2 inline-block ${v.kategori === 'Tahfidz' ? 'bg-emerald-500' : v.kategori === 'Tahsin' ? 'bg-blue-500' : 'bg-slate-800'}">${v.kategori || 'Kajian'}</span>
+                        <h4 class="font-bold text-base mb-1 pr-8 text-slate-800 leading-tight hover:text-primary cursor-pointer transition" onclick="openVideoModal('${v.url}', '${v.title.replace(/'/g, "\\'")}')">${v.title}</h4>
+                        <p class="text-xs text-slate-500"><i class="far fa-calendar-alt w-4"></i> ${v.tanggal || '-'}</p>
+                    </div>
+                </div>`;
             }).join('');
-
-            if(paginationUI) {
-                paginationUI.classList.remove('hidden'); paginationUI.classList.add('flex');
-                if(document.getElementById('video-page-info')) document.getElementById('video-page-info').innerText = `${videoPage} / ${totalPages}`;
-                if(document.getElementById('btn-prev-video')) document.getElementById('btn-prev-video').disabled = videoPage === 1;
-                if(document.getElementById('btn-next-video')) document.getElementById('btn-next-video').disabled = videoPage === totalPages;
-            }
-        };
+        }
 
         let editVideoId = null;
         window.editVideo = function(id) {
             const video = state.videos.find(v => v.id === id); if (!video) return;
-            
             if(document.getElementById('v-judul')) document.getElementById('v-judul').value = video.title || ''; 
             if(document.getElementById('v-kategori')) document.getElementById('v-kategori').value = video.kategori || 'Tahfidz'; 
             if(document.getElementById('v-tanggal')) document.getElementById('v-tanggal').value = video.tanggal || ''; 
@@ -832,7 +835,7 @@
             if (!currentUser) return;
             const titleEl = document.getElementById('v-judul'); const kategoriEl = document.getElementById('v-kategori'); 
             const tanggalEl = document.getElementById('v-tanggal'); const durasiEl = document.getElementById('v-durasi'); 
-            const urlEl = document.getElementById('v-url');
+            const urlEl = document.getElementById('v-url'); 
 
             const title = titleEl ? titleEl.value : ''; const kategori = kategoriEl ? kategoriEl.value : 'Tahfidz'; 
             const tanggal = tanggalEl ? tanggalEl.value : ''; const durasi = durasiEl ? durasiEl.value : ''; 
@@ -840,6 +843,7 @@
 
             if(!title || !url || !tanggal) return window.showToast("Harap isi judul, tanggal, dan URL!", "error");
             try {
+                // Thumbnail dikosongkan karena ditarik otomatis dari YouTube
                 const videoData = { title, kategori, tanggal, durasi, url, thumbnail: '' };
                 if (editVideoId) { 
                     await setDoc(doc(db, 'artifacts', appIdGlobal, 'public', 'data', 'videos', editVideoId), videoData, { merge: true }); 
