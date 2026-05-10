@@ -1,11 +1,11 @@
 {
-  "name": "Ruang Hafalan - Peserta",
-  "short_name": "Hafalan",
-  "description": "Aplikasi setoran hafalan Al-Quran",
+  "name": "Ruang Hafalan - Admin",
+  "short_name": "Admin Hafalan",
+  "description": "Panel Admin aplikasi setoran hafalan Al-Quran",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f8fafc",
-  "theme_color": "#10b981",
+  "theme_color": "#0ea5e9",
   "orientation": "portrait",
   "icons": [
     {
