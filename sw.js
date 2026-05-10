@@ -1,14 +1,14 @@
-const CACHE_NAME = 'hafalan-cache-v1';
+const CACHE_NAME = 'hafalan-admin-v1';
 const urlsToCache = [
+  './',
   './index.html',
   './manifest.json',
   './icon-192x192.png',
   './icon-512x512.png'
 ];
 
-// Install Service Worker & Cache file dasar
 self.addEventListener('install', event => {
-  self.skipWaiting(); // Memaksa SW baru untuk langsung aktif
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -17,7 +17,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activate & Hapus cache lama
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -32,16 +31,11 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Strategi: Network First, Fallback to Cache
-// Ini menjamin aplikasi selalu mendapatkan update terbaru dari GitHub saat online
 self.addEventListener('fetch', event => {
-  // Hanya proses request GET
   if (event.request.method !== 'GET') return;
-
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Jika berhasil ambil dari network (GitHub), simpan clone-nya ke cache
         if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
         }
@@ -51,9 +45,6 @@ self.addEventListener('fetch', event => {
         });
         return response;
       })
-      .catch(() => {
-        // Jika gagal (offline), ambil dari cache
-        return caches.match(event.request);
-      })
+      .catch(() => caches.match(event.request))
   );
 });
